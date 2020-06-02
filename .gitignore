@@ -88,3 +88,7 @@ sw.*
 
 # Vim swap files
 *.swp
+
+# User files
+connect_psql.sh
+db_session

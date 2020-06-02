@@ -1,7 +1,7 @@
 {
-  "name": "EpiTrello",
+  "name": "epi-trello",
   "version": "1.0.0",
-  "description": "Trello",
+  "description": "https://github.com/EpiTrello/EpiTrello-Web",
   "author": "EpiTrello Team",
   "private": true,
   "scripts": {
