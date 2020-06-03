@@ -6,7 +6,7 @@ setup:
 build:
   docker:
     web: Dockerfile
-  config:
+  # config:
     # NUXT_HOST: 0.0.0.0
     # NUXT_PORT: "%env(PORT)%"
 
