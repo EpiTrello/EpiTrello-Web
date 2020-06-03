@@ -8,7 +8,7 @@ build:
     web: Dockerfile
   config:
     NUXT_HOST: 0.0.0.0
-    NUXT_PORT: 5000
+    NUXT_PORT: "%env(PORT)%"
 
 run:
   web: npm run build && npm run start
