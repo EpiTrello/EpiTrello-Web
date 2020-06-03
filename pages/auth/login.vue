@@ -4,7 +4,7 @@
       <Alert :message="alert.message" :type="alert.type" v-if="alert.message" />
       <v-text-field v-model="username" placeholder="Username"></v-text-field>
       <v-text-field v-model="password" placeholder="Password"></v-text-field>
-      <v-btn @click="sendForm()">Register</v-btn>
+      <v-btn @click="sendForm()">Login</v-btn>
     </v-container>
   </v-layout>
 </template>
