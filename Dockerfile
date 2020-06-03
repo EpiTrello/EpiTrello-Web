@@ -1,5 +1,10 @@
 FROM node:12
 
+ARG DATABASE_URL
+ARG NODE_ENV
+ARG NUXT_HOST
+ARG NUXT_PORT
+
 WORKDIR /home/app
 
 COPY ./package.json .
