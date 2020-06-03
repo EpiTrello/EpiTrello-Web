@@ -6,11 +6,11 @@ setup:
 build:
   docker:
     web: Dockerfile
-    config:
-      DATABASE_URL: postgres://user:pass@postgres:5432/db
-      NODE_ENV: production
-      NUXT_HOST: 0.0.0.0
-      NUXT_PORT: ${PORT}
+  config:
+    DATABASE_URL: postgres://user:pass@postgres:5432/db
+    NODE_ENV: production
+    NUXT_HOST: 0.0.0.0
+    NUXT_PORT: ${PORT}
 
 run:
   web: npm run start
