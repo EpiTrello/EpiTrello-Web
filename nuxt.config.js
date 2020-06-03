@@ -1,4 +1,7 @@
 import colors from 'vuetify/es5/util/colors'
+import bodyParser from 'body-parser'
+var session = require('express-session');
+var PostgreSqlStore = require('connect-pg-simple')(session);
 
 export default {
   mode: 'universal',
@@ -51,6 +54,26 @@ export default {
   axios: {
   },
   /*
+  ** Server Middleware
+  ** Nuxt.js uses `connect` module as server
+  ** So most of express middleware works with nuxt.js server middleware
+  */
+  serverMiddleware: [
+    // body-parser middleware
+    bodyParser.json(),
+    // session middleware
+    session({
+      secret: 'keyboard cat',
+      cookie: { maxAge: 3600000 }, // 1 hour
+      resave: false, // does not forces the session to be saves back to the session store (we are using a store)
+      saveUninitialized: false, // does not store cookies session when first connecting
+      store: new PostgreSqlStore({ conString: process.env.DATABASE_URL }) // setting a store, the psql db needs to have a well formatted session table
+    }),
+    // Api middleware
+    // Api is used to implement new Post / Get routes to communicate with the database
+    '~/api'
+  ],
+  /*
   ** vuetify module configuration
   ** https://github.com/nuxt-community/vuetify-module
   */
@@ -78,7 +101,7 @@ export default {
     /*
     ** You can extend webpack config here
     */
-    extend (config, ctx) {
+    extend(config, ctx) {
     }
   }
 }
