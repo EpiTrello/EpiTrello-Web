@@ -92,3 +92,4 @@ sw.*
 # User files
 connect_psql.sh
 db_session
+heroku_purge_db.sh
