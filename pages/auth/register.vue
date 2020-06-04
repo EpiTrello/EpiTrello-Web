@@ -1,13 +1,17 @@
 <template>
-  <v-layout>
-    <v-container>
-      <Alert :message="alert.message" :type="alert.type" v-if="alert.message" />
-      <v-text-field v-model="username" placeholder="Username"></v-text-field>
-      <v-text-field v-model="password" placeholder="Password"></v-text-field>
-      <v-btn @click="sendForm()">Register</v-btn>
-    </v-container>
-  </v-layout>
+  <v-container fill-height fluid>
+    <v-col>
+    <Alert style="text-align: center;" :message="alert.message" :type="alert.type" v-if="alert.message" />
+    <v-layout column class="register-box pa-5 ma-auto">
+      <v-text-field v-model="username" placeholder="Identifiant"></v-text-field>
+      <v-text-field v-model="password" placeholder="Mot de passe"></v-text-field>
+      <v-text-field v-model="passwordc" placeholder="Confirmez le mot de passe"></v-text-field>
+      <v-btn @click="sendForm()">Inscrition</v-btn>
+    </v-layout>
+    </v-col>
+  </v-container>
 </template>
+
 
 <script>
 import Alert from "~/components/Alert";
@@ -21,6 +25,7 @@ export default {
     return {
       username: "",
       password: "",
+      passwordc: "",
       alert: {
         message: null,
         type: null
@@ -31,6 +36,11 @@ export default {
     async sendForm() {
       this.alert.message = "Connexion en cours";
       this.alert.type = "is-warning";
+      if (this.password !== this.passwordc) {
+
+      this.alert.message = "Les mots de passes de correspondent pas.";
+      this.alert.type = "is-danger";
+      }
       try {
         await this.$store.dispatch("register", {
           username: this.username,
@@ -47,3 +57,11 @@ export default {
   }
 };
 </script>
+
+<style>
+.register-box {
+  max-width: 350px;
+  max-height: 300px;
+  border: 1px solid white;
+}
+</style>
