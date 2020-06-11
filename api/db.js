@@ -57,6 +57,7 @@ async function getTabs(user_id) {
 }
 
 async function deleteTab(user_id, tab_id) {
+  // check if the user had created the specified tab
   const { rows } = await execQuery(
     'DELETE FROM TABLE_ WHERE ID = $1',
     [tab_id]
@@ -67,12 +68,26 @@ async function deleteTab(user_id, tab_id) {
 async function getTab(user_id, tab_id) {
   // check if the user has the specified tab
   const { rows } = await execQuery(
-    'SELECT COLUMN_.* FROM TABLE_COLUMN LEFT JOIN COLUMN_ ON TABLE_COLUMN.COLUMN_ID = COLUMN_.ID WHERE TABLE_COLUMN.ID = $1',
+    'SELECT COLUMN_.* FROM TABLE_COLUMN LEFT JOIN COLUMN_ ON TABLE_COLUMN.COLUMN_ID = COLUMN_.ID WHERE TABLE_COLUMN.TABLE_ID = $1',
     [tab_id]
   );
   // for each column get all card
+  // add rows.title props
   return rows;
 }
 
-var db = { register, login, getTabs, createTab, deleteTab, getTab }
+async function createColumn(user_id, tab_id, title) {
+  // check if the user had the specified tab
+  const { rows } = await execQuery(
+    'INSERT INTO COLUMN_(TITLE) VALUES($1) RETURNING *;',
+    [title]
+  )
+  await execQuery(
+    'INSERT INTO TABLE_COLUMN(TABLE_ID, COLUMN_ID) VALUES($1, $2);',
+    [tab_id, rows[0].id]
+  )
+  return rows[0].id;
+}
+
+var db = { register, login, getTabs, createTab, deleteTab, getTab, createColumn }
 module.exports = db

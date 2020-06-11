@@ -36,9 +36,9 @@ router.post('/createTab', async (req, res) => {
 router.post('/deleteTab', async (req, res) => {
   if (!req.session.user)
     return res.status(400).json({ ok: false, message: "user not auth" })
-  if (!req.body.id)
+  if (!req.body.tabID)
     return res.status(401).json({ ok: false, message: "missing required fields" })
-  const resp = await db.deleteTab(req.session.user.id, req.body.id)
+  const resp = await db.deleteTab(req.session.user.id, req.body.tabID)
   return res.json(resp)
 })
 
@@ -50,9 +50,22 @@ router.post('/deleteTab', async (req, res) => {
 router.post('/getTab', async (req, res) => {
   if (!req.session.user)
     return res.status(400).json({ ok: false, message: "user not auth" })
-  if (!req.body.id)
+  if (!req.body.tabID)
     return res.status(401).json({ ok: false, message: "missing required fields" })
-  const resp = await db.getTab(req.session.user.id, req.body.id)
+  const resp = await db.getTab(req.session.user.id, req.body.tabID)
+  return res.json(resp)
+})
+
+/**
+ * POST
+ * /api/db/createColumn
+ */
+router.post('/createColumn', async (req, res) => {
+  if (!req.session.user)
+    return res.status(400).json({ ok: false, message: "user not auth" })
+  if (!req.body.tabID || !req.body.title)
+    return res.status(401).json({ ok: false, message: "missing required fields" })
+  const resp = await db.createColumn(req.session.user.id, req.body.tabID, req.body.title)
   return res.json(resp)
 })
 

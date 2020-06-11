@@ -71,7 +71,7 @@ export default {
         method: "post",
         url: "/api/db/deleteTab",
         data: {
-          id: id
+          tabID: id
         }
       })
         .then(data => {
