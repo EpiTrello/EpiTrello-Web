@@ -64,5 +64,15 @@ async function deleteTab(user_id, tab_id) {
   return rows;
 }
 
-var db = { register, login, getTabs, createTab, deleteTab }
+async function getTab(user_id, tab_id) {
+  // check if the user has the specified tab
+  const { rows } = await execQuery(
+    'SELECT COLUMN_.* FROM TABLE_COLUMN LEFT JOIN COLUMN_ ON TABLE_COLUMN.COLUMN_ID = COLUMN_.ID WHERE TABLE_COLUMN.ID = $1',
+    [tab_id]
+  );
+  // for each column get all card
+  return rows;
+}
+
+var db = { register, login, getTabs, createTab, deleteTab, getTab }
 module.exports = db

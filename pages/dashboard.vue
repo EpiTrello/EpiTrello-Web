@@ -38,7 +38,7 @@ export default {
     },
     getTabs() {
       axios({
-        method: "post",
+        method: "get",
         url: "/api/db/getTabs"
       })
         .then(data => {

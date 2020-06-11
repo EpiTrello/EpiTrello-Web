@@ -8,7 +8,7 @@ var router = express.Router();
  * POST
  * /api/db/getTabs
  */
-router.post('/getTabs', async (req, res) => {
+router.get('/getTabs', async (req, res) => {
   if (!req.session.user)
     return res.status(400).json({ ok: false, message: "user not auth" })
   const resp = await db.getTabs(req.session.user.id)
@@ -41,5 +41,20 @@ router.post('/deleteTab', async (req, res) => {
   const resp = await db.deleteTab(req.session.user.id, req.body.id)
   return res.json(resp)
 })
+
+
+/**
+ * POST
+ * /api/db/getTab
+ */
+router.post('/getTab', async (req, res) => {
+  if (!req.session.user)
+    return res.status(400).json({ ok: false, message: "user not auth" })
+  if (!req.body.id)
+    return res.status(401).json({ ok: false, message: "missing required fields" })
+  const resp = await db.getTab(req.session.user.id, req.body.id)
+  return res.json(resp)
+})
+
 
 module.exports = router;
