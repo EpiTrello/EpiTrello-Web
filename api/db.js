@@ -83,8 +83,6 @@ async function getTab(user_id, tab_id) {
   for (var i in rows) {
     rows[i] = await getCards(rows[i])
   }
-  // for each column get all card
-  // add rows.title props
   return rows;
 }
 
@@ -117,5 +115,15 @@ async function createCard(user_id, title, col_id) {
   return rows;
 }
 
-var db = { register, login, getTabs, createTab, deleteTab, getTab, createColumn, deleteColumn, createCard }
+async function deleteCard(user_id, card_id) {
+  // get col object, get table ID
+  // check if the user has the specified tab
+  const { rows } = await execQuery(
+    'DELETE FROM CARD WHERE ID = $1',
+    [card_id]
+  )
+  return rows
+}
+
+var db = { register, login, getTabs, createTab, deleteTab, getTab, createColumn, deleteColumn, createCard, deleteCard }
 module.exports = db

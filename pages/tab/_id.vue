@@ -12,6 +12,7 @@
           <!-- each cards -->
           <div v-for="card in column.cards" :key="card.id">
             {{ card.title }}
+            <v-btn @click="deleteCard(card.id)">Delete card</v-btn>
           </div>
           <!-- /each cards -->
           <!-- create Card -->
@@ -108,6 +109,22 @@ export default {
         data: {
           title: title,
           columnID: columnID
+        }
+      })
+        .then(data => {
+          this.refresh();
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    },
+
+    deleteCard(cardID) {
+      axios({
+        method: "post",
+        url: "/api/db/deleteCard",
+        data: {
+          cardID: cardID
         }
       })
         .then(data => {

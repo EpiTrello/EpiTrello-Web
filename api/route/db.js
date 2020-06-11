@@ -96,5 +96,18 @@ router.post('/createCard', async (req, res) => {
   return res.json(resp)
 })
 
+/**
+ * POST
+ * /api/db/deleteCard
+ */
+router.post('/deleteCard', async (req, res) => {
+  if (!req.session.user)
+    return res.status(400).json({ ok: false, message: "user not auth" })
+  if (!req.body.cardID)
+    return res.status(401).json({ ok: false, message: "missing required fields" })
+  const resp = await db.deleteCard(req.session.user.id, req.body.cardID)
+  return res.json(resp)
+})
+
 
 module.exports = router;
