@@ -69,5 +69,32 @@ router.post('/createColumn', async (req, res) => {
   return res.json(resp)
 })
 
+/**
+ * POST
+ * /api/db/deleteColumn
+ */
+router.post('/deleteColumn', async (req, res) => {
+  if (!req.session.user)
+    return res.status(400).json({ ok: false, message: "user not auth" })
+  if (!req.body.columnID)
+    return res.status(401).json({ ok: false, message: "missing required fields" })
+  const resp = await db.deleteColumn(req.session.user.id, req.body.columnID)
+  return res.json(resp)
+})
+
+
+/**
+ * POST
+ * /api/db/createCard
+ */
+router.post('/createCard', async (req, res) => {
+  if (!req.session.user)
+    return res.status(400).json({ ok: false, message: "user not auth" })
+  if (!req.body.title || !req.body.columnID)
+    return res.status(401).json({ ok: false, message: "missing required fields" })
+  const resp = await db.createCard(req.session.user.id, req.body.title, req.body.columnID)
+  return res.json(resp)
+})
+
 
 module.exports = router;

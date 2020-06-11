@@ -40,7 +40,8 @@ SET default_with_oids = false;
 
 CREATE TABLE public.card (
     id integer NOT NULL,
-    title text NOT NULL
+    title text NOT NULL,
+    column_id integer
 );
 
 
@@ -74,7 +75,8 @@ ALTER SEQUENCE public.card_id_seq OWNED BY public.card.id;
 
 CREATE TABLE public.column_ (
     id integer NOT NULL,
-    title text NOT NULL
+    title text NOT NULL,
+    table_id integer
 );
 
 
@@ -100,41 +102,6 @@ ALTER TABLE public.column__id_seq OWNER TO "user";
 --
 
 ALTER SEQUENCE public.column__id_seq OWNED BY public.column_.id;
-
-
---
--- Name: column_card; Type: TABLE; Schema: public; Owner: user
---
-
-CREATE TABLE public.column_card (
-    id integer NOT NULL,
-    column_id integer,
-    card_id integer
-);
-
-
-ALTER TABLE public.column_card OWNER TO "user";
-
---
--- Name: column_card_id_seq; Type: SEQUENCE; Schema: public; Owner: user
---
-
-CREATE SEQUENCE public.column_card_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.column_card_id_seq OWNER TO "user";
-
---
--- Name: column_card_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
---
-
-ALTER SEQUENCE public.column_card_id_seq OWNED BY public.column_card.id;
 
 
 --
@@ -182,41 +149,6 @@ ALTER TABLE public.table__id_seq OWNER TO "user";
 --
 
 ALTER SEQUENCE public.table__id_seq OWNED BY public.table_.id;
-
-
---
--- Name: table_column; Type: TABLE; Schema: public; Owner: user
---
-
-CREATE TABLE public.table_column (
-    id integer NOT NULL,
-    table_id integer,
-    column_id integer
-);
-
-
-ALTER TABLE public.table_column OWNER TO "user";
-
---
--- Name: table_column_id_seq; Type: SEQUENCE; Schema: public; Owner: user
---
-
-CREATE SEQUENCE public.table_column_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.table_column_id_seq OWNER TO "user";
-
---
--- Name: table_column_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
---
-
-ALTER SEQUENCE public.table_column_id_seq OWNED BY public.table_column.id;
 
 
 --
@@ -304,24 +236,10 @@ ALTER TABLE ONLY public.column_ ALTER COLUMN id SET DEFAULT nextval('public.colu
 
 
 --
--- Name: column_card id; Type: DEFAULT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.column_card ALTER COLUMN id SET DEFAULT nextval('public.column_card_id_seq'::regclass);
-
-
---
 -- Name: table_ id; Type: DEFAULT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.table_ ALTER COLUMN id SET DEFAULT nextval('public.table__id_seq'::regclass);
-
-
---
--- Name: table_column id; Type: DEFAULT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.table_column ALTER COLUMN id SET DEFAULT nextval('public.table_column_id_seq'::regclass);
 
 
 --
@@ -342,7 +260,7 @@ ALTER TABLE ONLY public.user_table ALTER COLUMN id SET DEFAULT nextval('public.u
 -- Data for Name: card; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.card (id, title) FROM stdin;
+COPY public.card (id, title, column_id) FROM stdin;
 \.
 
 
@@ -350,15 +268,7 @@ COPY public.card (id, title) FROM stdin;
 -- Data for Name: column_; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.column_ (id, title) FROM stdin;
-\.
-
-
---
--- Data for Name: column_card; Type: TABLE DATA; Schema: public; Owner: user
---
-
-COPY public.column_card (id, column_id, card_id) FROM stdin;
+COPY public.column_ (id, title, table_id) FROM stdin;
 \.
 
 
@@ -375,14 +285,6 @@ COPY public.session (sid, sess, expire) FROM stdin;
 --
 
 COPY public.table_ (id, title) FROM stdin;
-\.
-
-
---
--- Data for Name: table_column; Type: TABLE DATA; Schema: public; Owner: user
---
-
-COPY public.table_column (id, table_id, column_id) FROM stdin;
 \.
 
 
@@ -417,24 +319,10 @@ SELECT pg_catalog.setval('public.column__id_seq', 1, false);
 
 
 --
--- Name: column_card_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
---
-
-SELECT pg_catalog.setval('public.column_card_id_seq', 1, false);
-
-
---
 -- Name: table__id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
 SELECT pg_catalog.setval('public.table__id_seq', 1, false);
-
-
---
--- Name: table_column_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
---
-
-SELECT pg_catalog.setval('public.table_column_id_seq', 1, false);
 
 
 --
@@ -468,14 +356,6 @@ ALTER TABLE ONLY public.column_
 
 
 --
--- Name: column_card column_card_pkey; Type: CONSTRAINT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.column_card
-    ADD CONSTRAINT column_card_pkey PRIMARY KEY (id);
-
-
---
 -- Name: session session_pkey; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
@@ -489,14 +369,6 @@ ALTER TABLE ONLY public.session
 
 ALTER TABLE ONLY public.table_
     ADD CONSTRAINT table__pkey PRIMARY KEY (id);
-
-
---
--- Name: table_column table_column_pkey; Type: CONSTRAINT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.table_column
-    ADD CONSTRAINT table_column_pkey PRIMARY KEY (id);
 
 
 --
@@ -524,35 +396,19 @@ ALTER TABLE ONLY public.user_table
 
 
 --
--- Name: column_card column_card_card_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
+-- Name: card card_column_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
 --
 
-ALTER TABLE ONLY public.column_card
-    ADD CONSTRAINT column_card_card_id_fkey FOREIGN KEY (card_id) REFERENCES public.card(id) ON DELETE CASCADE;
-
-
---
--- Name: column_card column_card_column_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.column_card
-    ADD CONSTRAINT column_card_column_id_fkey FOREIGN KEY (column_id) REFERENCES public.column_(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.card
+    ADD CONSTRAINT card_column_id_fkey FOREIGN KEY (column_id) REFERENCES public.column_(id) ON DELETE CASCADE;
 
 
 --
--- Name: table_column table_column_column_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
+-- Name: column_ column__table_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
 --
 
-ALTER TABLE ONLY public.table_column
-    ADD CONSTRAINT table_column_column_id_fkey FOREIGN KEY (column_id) REFERENCES public.column_(id) ON DELETE CASCADE;
-
-
---
--- Name: table_column table_column_table_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.table_column
-    ADD CONSTRAINT table_column_table_id_fkey FOREIGN KEY (table_id) REFERENCES public.table_(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.column_
+    ADD CONSTRAINT column__table_id_fkey FOREIGN KEY (table_id) REFERENCES public.table_(id) ON DELETE CASCADE;
 
 
 --

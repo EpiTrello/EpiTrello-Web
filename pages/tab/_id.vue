@@ -2,19 +2,33 @@
   <v-layout>
     <div v-if="error">{{ error }}</div>
     <v-layout row>
-      <!-- Each column -->
+      <!-- each column -->
       <div v-for="column in columns" :key="column.id">
         <v-card>
           <v-card-title>{{ column.title }}</v-card-title>
+          <v-card-actions>
+            <v-btn @click="deleteColumn(column.id)">Delete column</v-btn>
+          </v-card-actions>
+          <!-- each cards -->
+          <div v-for="card in column.cards" :key="card.id">
+            {{ card.title }}
+          </div>
+          <!-- /each cards -->
+          <!-- create Card -->
+          <div>
+            <v-text-field v-model="column.newCardTitle" placeholder="Titre card"></v-text-field>
+            <v-btn @click="createCard(column.newCardTitle, column.id)">Create Card</v-btn>
+          </div>
+          <!-- /create Card -->
         </v-card>
       </div>
-      <!-- / Each column -->
-      <!-- Add column -->
+      <!-- /each column -->
+      <!-- create column -->
       <div>
         <v-text-field v-model="columnTitle" placeholder="Titre col"></v-text-field>
-        <v-btn @click="createColumn(columnTitle)">Add cloumn</v-btn>
+        <v-btn @click="createColumn(columnTitle)">Add column</v-btn>
       </div>
-      <!-- /Add column -->
+      <!-- /create column -->
     </v-layout>
   </v-layout>
 </template>
@@ -26,14 +40,14 @@ import axios from "axios";
 export default {
   async asyncData({ app, params, redirect }) {
     return {
-      id: params.id,
-      columns: []
+      id: params.id
     };
   },
   data() {
     return {
       error: false,
-      columnTitle: ""
+      columnTitle: "",
+      columns: []
     };
   },
   created() {
@@ -41,6 +55,7 @@ export default {
   },
   methods: {
     refresh() {
+      this.columns = [];
       axios({
         method: "post",
         url: "/api/db/getTab",
@@ -62,6 +77,37 @@ export default {
         data: {
           tabID: this.id,
           title: title
+        }
+      })
+        .then(data => {
+          this.refresh();
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    },
+    deleteColumn(id) {
+      axios({
+        method: "post",
+        url: "/api/db/deleteColumn",
+        data: {
+          columnID: id
+        }
+      })
+        .then(data => {
+          this.refresh();
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    },
+    createCard(title, columnID) {
+      axios({
+        method: "post",
+        url: "/api/db/createCard",
+        data: {
+          title: title,
+          columnID: columnID
         }
       })
         .then(data => {
