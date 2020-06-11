@@ -56,5 +56,13 @@ async function getTabs(user_id) {
   return rows;
 }
 
-var db = { register, login, getTabs, createTab }
+async function deleteTab(user_id, tab_id) {
+  const { rows } = await execQuery(
+    'DELETE FROM TABLE_ WHERE ID = $1',
+    [tab_id]
+  );
+  return rows;
+}
+
+var db = { register, login, getTabs, createTab, deleteTab }
 module.exports = db

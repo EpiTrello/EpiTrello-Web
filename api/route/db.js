@@ -29,5 +29,17 @@ router.post('/createTab', async (req, res) => {
   return res.json(resp)
 })
 
+/**
+ * POST
+ * /api/db/deleteTab
+ */
+router.post('/deleteTab', async (req, res) => {
+  if (!req.session.user)
+    return res.status(400).json({ ok: false, message: "user not auth" })
+  if (!req.body.id)
+    return res.status(401).json({ ok: false, message: "missing required fields" })
+  const resp = await db.deleteTab(req.session.user.id, req.body.id)
+  return res.json(resp)
+})
 
 module.exports = router;

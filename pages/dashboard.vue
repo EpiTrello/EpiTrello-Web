@@ -7,6 +7,7 @@
       <h1>{{ $store.state.user.id }}</h1>
       <v-container v-for="tab in tabs" :key="tab.id">
         <nuxt-link :to="tabLink(tab.id)">{{tab.title}}</nuxt-link>
+        <v-btn @click="deleteTab(tab.id)">Delete</v-btn>
       </v-container>
       <v-container>
         <v-text-field v-model="title" placeholder="Titre"></v-text-field>
@@ -60,6 +61,21 @@ export default {
             id: data.data.id,
             title: title
           });
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    },
+    deleteTab(id) {
+      axios({
+        method: "post",
+        url: "/api/db/deleteTab",
+        data: {
+          id: id
+        }
+      })
+        .then(data => {
+          this.getTabs();
         })
         .catch(error => {
           this.error = error.message;
