@@ -93,3 +93,5 @@ sw.*
 connect_psql.sh
 db_session
 heroku_purge_db.sh
+psql_connect.sh
+psql_dump.sh
