@@ -2,6 +2,7 @@
   <v-container fill-height fluid>
     <v-col>
     <Alert style="text-align: center;" :message="alert.message" :type="alert.type" v-if="alert.message" />
+    <h1 style="text-align: center;">Inscription</h1>
     <v-layout column class="register-box pa-5 ma-auto">
       <v-text-field v-model="username" placeholder="Identifiant"></v-text-field>
       <v-text-field v-model="password" placeholder="Mot de passe"></v-text-field>

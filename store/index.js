@@ -67,5 +67,6 @@ export const actions = {
   async logout({ commit }) {
     await axios.post('/api/auth/logout')
     commit('LOGOUT')
+    this.$router.push('/')
   },
 }
