@@ -88,11 +88,11 @@ async function getTab(user_id, tab_id) {
   return rows;
 }
 
-async function createColumn(user_id, tab_id, title) {
+async function createColumn(user_id, tab_id, title, color, text_color) {
   // check if the user had the specified tab
   const { rows } = await execQuery(
-    'INSERT INTO COLUMN_(TITLE, TABLE_ID) VALUES($1, $2) RETURNING *;',
-    [title, tab_id]
+    'INSERT INTO COLUMN_(TITLE, TABLE_ID, COLOR, TEXT_COLOR) VALUES($1, $2, $3, $4) RETURNING *;',
+    [title, tab_id, color, text_color]
   )
   return rows[0].id;
 }
@@ -107,12 +107,12 @@ async function deleteColumn(user_id, col_id) {
   return rows;
 }
 
-async function createCard(user_id, title, col_id) {
+async function createCard(user_id, title, col_id, color, text_color) {
   // get col object, get table ID
   // check if the user had the specified tab
   const { rows } = await execQuery(
-    'INSERT INTO CARD(TITLE, COLUMN_ID) VALUES($1, $2) RETURNING *;',
-    [title, col_id]
+    'INSERT INTO CARD(TITLE, COLUMN_ID, COLOR, TEXT_COLOR) VALUES($1, $2, $3, $4) RETURNING *;',
+    [title, col_id, color, text_color]
   )
   return rows;
 }

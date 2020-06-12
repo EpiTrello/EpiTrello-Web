@@ -41,6 +41,8 @@ SET default_with_oids = false;
 CREATE TABLE public.card (
     id integer NOT NULL,
     title text NOT NULL,
+    color text DEFAULT '#272727'::text NOT NULL,
+    text_color text DEFAULT '#ff'::text NOT NULL,
     column_id integer
 );
 
@@ -76,6 +78,8 @@ ALTER SEQUENCE public.card_id_seq OWNED BY public.card.id;
 CREATE TABLE public.column_ (
     id integer NOT NULL,
     title text NOT NULL,
+    color text DEFAULT '#1E1E1E'::text NOT NULL,
+    text_color text DEFAULT '#ff'::text NOT NULL,
     table_id integer
 );
 
@@ -260,7 +264,7 @@ ALTER TABLE ONLY public.user_table ALTER COLUMN id SET DEFAULT nextval('public.u
 -- Data for Name: card; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.card (id, title, column_id) FROM stdin;
+COPY public.card (id, title, color, text_color, column_id) FROM stdin;
 \.
 
 
@@ -268,7 +272,7 @@ COPY public.card (id, title, column_id) FROM stdin;
 -- Data for Name: column_; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.column_ (id, title, table_id) FROM stdin;
+COPY public.column_ (id, title, color, text_color, table_id) FROM stdin;
 \.
 
 
