@@ -30,11 +30,11 @@
       <span @click="logout" class="link">Se déconnecter</span>
       </div>
     </v-app-bar>
-    <v-main>
+    <v-content>
       <v-container fill-height fluid>
         <nuxt />
       </v-container>
-    </v-main>
+    </v-content>
     <v-footer :fixed="fixed" app>
       <span>&copy; {{ new Date().getFullYear() }}</span>
     </v-footer>

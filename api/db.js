@@ -83,6 +83,8 @@ async function getTab(user_id, tab_id) {
   for (var i in rows) {
     rows[i] = await getCards(rows[i])
   }
+  if (rows[0].id == null)
+    return [];
   return rows;
 }
 
