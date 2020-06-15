@@ -109,5 +109,17 @@ router.post('/deleteCard', async (req, res) => {
   return res.json(resp)
 })
 
+/**
+ * POST
+ * /api/db/leaveTab
+ */
+router.post('/leaveTab', async (req, res) => {
+  if (!req.session.user)
+    return res.status(400).json({ ok: false, message: "user not auth" })
+  if (!req.body.tabID)
+    return res.status(401).json({ ok: false, message: "missing required fields" })
+  const resp = await db.leaveTab(req.session.user.id, req.body.cardID)
+  return res.json(resp)
+})
 
 module.exports = router;

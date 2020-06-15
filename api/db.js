@@ -139,5 +139,14 @@ async function deleteCard(user_id, card_id) {
   return rows
 }
 
-var db = { register, login, getTabs, createTab, deleteTab, getTab, createColumn, deleteColumn, createCard, deleteCard }
+async function leaveTab(user_id, tab_id) {
+  const { rows } = await execQuery(
+    'DELETE FROM USER_TABLE WHERE USER_ID = $1 AND TABLE_ID = $2',
+    [user_id, tab_id]
+  )
+  console.log(rows)
+  return rows
+}
+
+var db = { register, login, getTabs, createTab, deleteTab, getTab, createColumn, deleteColumn, createCard, deleteCard, leaveTab }
 module.exports = db
