@@ -42,7 +42,7 @@ async function createTab(user_id, title) {
     [title]
   )
   await execQuery(
-    'INSERT INTO USER_TABLE(USER_ID, TABLE_ID) VALUES($1, $2);',
+    'INSERT INTO USER_TABLE(USER_ID, TABLE_ID, OWNER) VALUES($1, $2, TRUE);',
     [user_id, rows[0].id]
   )
   return { id: rows[0].id }
@@ -57,12 +57,24 @@ async function getTabs(user_id) {
 }
 
 async function deleteTab(user_id, tab_id) {
-  // check if the user had created the specified tab
+  // Check tab owner
   const { rows } = await execQuery(
+    'SELECT TABLE_.ID FROM USER_TABLE LEFT JOIN TABLE_ ON USER_TABLE.TABLE_ID = TABLE_.ID WHERE USER_TABLE.USER_ID = $1 AND USER_TABLE.OWNER = TRUE',
+    [user_id]
+  )
+  var owner = false;
+  for (var i in rows)
+    if (rows[i].id == tab_id)
+      owner = true;
+  if (!owner)
+    return ({ok: false, message: 'You are not the owner of the tab'});
+
+  // delete tab
+  await execQuery(
     'DELETE FROM TABLE_ WHERE ID = $1',
     [tab_id]
   );
-  return rows;
+  return ({ok: true});
 }
 
 async function getCards(column) {

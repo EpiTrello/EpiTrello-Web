@@ -41,8 +41,8 @@ SET default_with_oids = false;
 CREATE TABLE public.card (
     id integer NOT NULL,
     title text NOT NULL,
-    color text DEFAULT '#272727'::text NOT NULL,
-    text_color text DEFAULT '#ff'::text NOT NULL,
+    color text NOT NULL,
+    text_color text NOT NULL,
     column_id integer
 );
 
@@ -78,8 +78,8 @@ ALTER SEQUENCE public.card_id_seq OWNED BY public.card.id;
 CREATE TABLE public.column_ (
     id integer NOT NULL,
     title text NOT NULL,
-    color text DEFAULT '#1E1E1E'::text NOT NULL,
-    text_color text DEFAULT '#ff'::text NOT NULL,
+    color text NOT NULL,
+    text_color text NOT NULL,
     table_id integer
 );
 
@@ -197,7 +197,8 @@ ALTER SEQUENCE public.user__id_seq OWNED BY public.user_.id;
 CREATE TABLE public.user_table (
     id integer NOT NULL,
     user_id integer,
-    table_id integer
+    table_id integer,
+    owner boolean NOT NULL
 );
 
 
@@ -304,7 +305,7 @@ COPY public.user_ (id, username, password) FROM stdin;
 -- Data for Name: user_table; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.user_table (id, user_id, table_id) FROM stdin;
+COPY public.user_table (id, user_id, table_id, owner) FROM stdin;
 \.
 
 
