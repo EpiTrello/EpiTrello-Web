@@ -56,7 +56,7 @@ export default {
     getTabs() {
       axios({
         method: 'get',
-        url: '/api/db/getTabs',
+        url: '/api/getTabs',
       })
         .then(data => {
           this.tabs = data.data
@@ -69,7 +69,7 @@ export default {
       if (title === '') return
       axios({
         method: 'post',
-        url: '/api/db/createTab',
+        url: '/api/createTab',
         data: {
           title: title,
         },
@@ -87,7 +87,7 @@ export default {
     deleteTab(id) {
       axios({
         method: 'post',
-        url: '/api/db/deleteTab',
+        url: '/api/deleteTab',
         data: {
           tabID: id,
         },

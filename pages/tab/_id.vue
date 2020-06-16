@@ -108,7 +108,7 @@ export default {
       this.columns = []
       axios({
         method: 'post',
-        url: '/api/db/getTab',
+        url: '/api/getTab',
         data: {
           tabID: this.id,
         },
@@ -123,7 +123,7 @@ export default {
     createColumn(title, color, textColor) {
       axios({
         method: 'post',
-        url: '/api/db/createColumn',
+        url: '/api/createColumn',
         data: {
           tabID: this.id,
           title: title,
@@ -141,7 +141,7 @@ export default {
     deleteColumn(id) {
       axios({
         method: 'post',
-        url: '/api/db/deleteColumn',
+        url: '/api/deleteColumn',
         data: {
           columnID: id,
         },
@@ -156,7 +156,7 @@ export default {
     createCard(title, columnID, color, textColor) {
       axios({
         method: 'post',
-        url: '/api/db/createCard',
+        url: '/api/createCard',
         data: {
           title: title,
           columnID: columnID,
@@ -175,7 +175,7 @@ export default {
     deleteCard(cardID) {
       axios({
         method: 'post',
-        url: '/api/db/deleteCard',
+        url: '/api/deleteCard',
         data: {
           cardID: cardID,
         },

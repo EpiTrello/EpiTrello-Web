@@ -6,7 +6,7 @@ var router = express.Router();
 
 /**
  * POST
- * /api/db/getTabs
+ * /api/getTabs
  */
 router.get('/getTabs', async (req, res) => {
   if (!req.session.user)
@@ -18,7 +18,7 @@ router.get('/getTabs', async (req, res) => {
 
 /**
  * POST
- * /api/db/createTab
+ * /api/createTab
  */
 router.post('/createTab', async (req, res) => {
   if (!req.session.user)
@@ -31,7 +31,7 @@ router.post('/createTab', async (req, res) => {
 
 /**
  * POST
- * /api/db/deleteTab
+ * /api/deleteTab
  */
 router.post('/deleteTab', async (req, res) => {
   if (!req.session.user)
@@ -45,7 +45,7 @@ router.post('/deleteTab', async (req, res) => {
 
 /**
  * POST
- * /api/db/getTab
+ * /api/getTab
  */
 router.post('/getTab', async (req, res) => {
   if (!req.session.user)
@@ -58,7 +58,7 @@ router.post('/getTab', async (req, res) => {
 
 /**
  * POST
- * /api/db/createColumn
+ * /api/createColumn
  */
 router.post('/createColumn', async (req, res) => {
   if (!req.session.user)
@@ -71,7 +71,7 @@ router.post('/createColumn', async (req, res) => {
 
 /**
  * POST
- * /api/db/deleteColumn
+ * /api/deleteColumn
  */
 router.post('/deleteColumn', async (req, res) => {
   if (!req.session.user)
@@ -85,7 +85,7 @@ router.post('/deleteColumn', async (req, res) => {
 
 /**
  * POST
- * /api/db/createCard
+ * /api/createCard
  */
 router.post('/createCard', async (req, res) => {
   if (!req.session.user)
@@ -98,7 +98,7 @@ router.post('/createCard', async (req, res) => {
 
 /**
  * POST
- * /api/db/deleteCard
+ * /api/deleteCard
  */
 router.post('/deleteCard', async (req, res) => {
   if (!req.session.user)
@@ -111,7 +111,7 @@ router.post('/deleteCard', async (req, res) => {
 
 /**
  * POST
- * /api/db/leaveTab
+ * /api/leaveTab
  */
 router.post('/leaveTab', async (req, res) => {
   if (!req.session.user)
@@ -121,5 +121,10 @@ router.post('/leaveTab', async (req, res) => {
   const resp = await db.leaveTab(req.session.user.id, req.body.cardID)
   return res.json(resp)
 })
+
+/**
+ * /api/searchUser
+ */
+
 
 module.exports = router;
