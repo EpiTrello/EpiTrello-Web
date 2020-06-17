@@ -10,21 +10,20 @@ var router = express.Router();
  */
 router.post('/login', async (req, res) => {
   if (!req.body.username || !req.body.password)
-    return res.status(400).json({ ok: false, message: "missing required fields" })
+    return res.status(400).json({ message: "missing required fields" })
 
   const resp = await db.login(req.body.username, req.body.password)
-  if (!resp.ok)
-    return res.status(400).json({ ok: false, message: "Wrong username / password combinaison" })
+  if (resp.status != 200)
+    return res.status(resp.status).json(resp.data)
 
   const user = {
     username: req.body.username,
-    id: resp.id
+    id: resp.data.id
   }
   // Sets session variable (into cookies)
   req.session.user = user
   req.session.loggedIn = true
-  return res.json(user)
-
+  return res.status(200).json(user)
 })
 
 /**
@@ -35,7 +34,7 @@ router.post('/logout', (req, res) => {
   delete req.session.user
   delete req.session.loggedIn
   res.clearCookie('connect.sid');
-  res.json({ ok: true })
+  res.status(200).json()
 })
 
 /**
@@ -46,9 +45,7 @@ router.post('/register', async (req, res) => {
   if (!req.body.username || !req.body.password)
     return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.register(req.body.username, req.body.password)
-  if (!resp.ok)
-    return res.status(400).json(resp);
-  res.status(200).json({ ok: true });
+  return res.status(resp.status).json(resp.data);
 })
 
 module.exports = router;

@@ -14,7 +14,7 @@ router.post('/search', async (req, res) => {
   if (!req.body.username)
     return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.searchUser(req.session.user.id, req.body.username)
-  return res.json(resp)
+  return res.status(resp.status).json(resp.data)
 })
 
 /**
@@ -27,7 +27,7 @@ router.post('/addFriend', async (req, res) => {
   if (!req.body.username)
     return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.addFriend(req.session.user.id, req.body.username)
-  return res.json(resp)
+  return res.status(resp.status).json(resp.data)
 })
 
 module.exports = router;

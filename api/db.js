@@ -6,13 +6,15 @@ const salt = bcrypt.genSaltSync(saltRounds);
 var pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 
-async function execQuery(query, values) {
-  try {
-    const resp = await pool.query(query, values)
-    return resp
-  } catch {
-    return { ok: false, message: "query failed" }
+function makeResp(status, data) {
+  return {
+    status: status,
+    data: data
   }
+}
+
+function execQuery(query, values) {
+  return pool.query(query, values)
 }
 
 async function register(username, password) {
@@ -20,12 +22,12 @@ async function register(username, password) {
   const values = [username]
   const { rows } = await execQuery(query, values);
   if (rows.length != 0)
-    return ({ ok: false, message: "username already exist" })
+    return makeResp(403, { message: "username already exist" })
   const query_insert = 'INSERT INTO USER_(username, password) VALUES($1, $2);'
   const hash = bcrypt.hashSync(password, salt);
   const values_insert = [username, hash];
   await execQuery(query_insert, values_insert);
-  return ({ ok: true })
+  return makeResp(200)
 }
 
 
@@ -34,11 +36,11 @@ async function login(username, password) {
   const values = [username];
   const { rows } = await execQuery(query, values);
   if (rows.length == 0)
-    return ({ ok: false })
+    return makeResp(400)
   const hash = bcrypt.hashSync(rows[0].password, salt);
   if (!bcrypt.compareSync(rows[0].password, hash))
-    return ({ ok: false })
-  return ({ ok: true, id: rows[0].id })
+    return makeResp(400)
+  return makeResp(200, {id: rows[0].id})
 }
 
 async function createBoard(user_id, title) {
@@ -50,7 +52,7 @@ async function createBoard(user_id, title) {
     'INSERT INTO USER_BOARD(USER_ID, BOARD_ID, OWNER) VALUES($1, $2, TRUE);',
     [user_id, rows[0].id]
   )
-  return { id: rows[0].id }
+  return makeResp(200, {id: rows[0].id})
 }
 
 async function getBoards(user_id) {
@@ -58,7 +60,7 @@ async function getBoards(user_id) {
     'SELECT BOARD.* FROM USER_BOARD LEFT JOIN BOARD ON USER_BOARD.BOARD_ID = BOARD.ID WHERE USER_BOARD.USER_ID = $1',
     [user_id]
   );
-  return rows;
+  return makeResp(200, rows)
 }
 
 async function deleteBoard(user_id, board_id) {
@@ -72,14 +74,14 @@ async function deleteBoard(user_id, board_id) {
     if (rows[i].id == board_id)
       owner = true;
   if (!owner)
-    return ({ ok: false, message: 'You are not the owner of the board' });
+    return makeResp(403, {message: 'You are not the owner of the board'})
 
   // delete tab
   await execQuery(
     'DELETE FROM BOARD WHERE ID = $1',
     [board_id]
   );
-  return ({ ok: true });
+  return makeResp(200);
 }
 
 async function getCards(column) {
@@ -101,8 +103,8 @@ async function getBoard(user_id, board_id) {
     rows[i] = await getCards(rows[i])
   }
   if (!rows[0] || rows[0].id == null)
-    return [];
-  return rows;
+    return makeResp(200);
+  return makeResp(200, rows);
 }
 
 async function createColumn(user_id, board_id, title, color, text_color) {
@@ -111,7 +113,8 @@ async function createColumn(user_id, board_id, title, color, text_color) {
     'INSERT INTO COLUMN_(TITLE, BOARD_ID, COLOR, TEXT_COLOR) VALUES($1, $2, $3, $4) RETURNING *;',
     [title, board_id, color, text_color]
   )
-  return rows[0].id;
+  rows.status = 200
+  return makeResp(200, rows[0].id)
 }
 
 async function deleteColumn(user_id, col_id) {
@@ -121,7 +124,7 @@ async function deleteColumn(user_id, col_id) {
     'DELETE FROM COLUMN_ WHERE ID = $1',
     [col_id]
   )
-  return rows;
+  return makeResp(200, rows)
 }
 
 async function createCard(user_id, title, col_id, color, text_color) {
@@ -131,7 +134,7 @@ async function createCard(user_id, title, col_id, color, text_color) {
     'INSERT INTO CARD(TITLE, COLUMN_ID, COLOR, TEXT_COLOR) VALUES($1, $2, $3, $4) RETURNING *;',
     [title, col_id, color, text_color]
   )
-  return rows;
+  return makeResp(200, rows)
 }
 
 async function deleteCard(user_id, card_id) {
@@ -141,7 +144,7 @@ async function deleteCard(user_id, card_id) {
     'DELETE FROM CARD WHERE ID = $1',
     [card_id]
   )
-  return rows
+  return makeResp(200, rows)
 }
 
 async function leaveBoard(user_id, board_id) {
@@ -150,8 +153,7 @@ async function leaveBoard(user_id, board_id) {
     [user_id, board_id]
   )
   // Need to be tested
-  console.log(rows)
-  return rows
+  return makeResp(200, rows)
 }
 
 async function searchUser(user_id, user_name) {
@@ -159,11 +161,19 @@ async function searchUser(user_id, user_name) {
     'SELECT id, username FROM USER_ WHERE username LIKE $1',
     ['%' + user_name + '%']
   )
-  return rows
+  return makeResp(200, rows)
 }
 
 async function addFriend(user_id, friend_username) {
-
+  const { rows } = await execQuery(
+    'SELECT id FROM USER_ WHERE username = $1',
+    [friend_username]
+  )
+  if (!rows[0])
+    return makeResp(400, {message: 'user not found'})
+  if (rows[0].id == user_id)
+    return makeResp(403, 'cannot self-add')
+  return makeResp(200, rows)
 }
 
 var db = {
