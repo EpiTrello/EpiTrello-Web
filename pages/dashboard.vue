@@ -8,15 +8,15 @@
         >
         <h1>Vos tableaux</h1>
         <v-layout row ma-0 mt-5>
-          <v-card class="my-card mr-2 mb-2 px-5" v-for="tab in tabs" :key="tab.id">
+          <v-card class="my-card mr-2 mb-2 px-5" v-for="board in boards" :key="board.id">
             <v-list-item-content>
               <v-list-item-title class="headline mb-1">
-                <nuxt-link class="card-title" :to="tabLink(tab.id)">{{ tab.title }} </nuxt-link></v-list-item-title
+                <nuxt-link class="card-title" :to="boardLink(board.id)">{{ board.title }} </nuxt-link></v-list-item-title
               >
             </v-list-item-content>
             <v-card-actions class="ma-0 pa-0 pt-3 ml-1">
               <v-spacer />
-              <v-btn @click="deleteTab(tab.id)" color="error" fab small dark>
+              <v-btn @click="deleteBoard(board.id)" color="error" fab small dark>
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </v-card-actions>
@@ -24,7 +24,7 @@
           <v-card class="my-card">
             <v-layout column class="pb-5 px-5">
               <v-text-field v-model="title" placeholder="Nom du tableau"></v-text-field>
-              <v-btn @click="createTab(title)">Créer un nouveau tableau</v-btn>
+              <v-btn @click="createBoard(title)">Créer un nouveau tableau</v-btn>
             </v-layout>
           </v-card>
         </v-layout>
@@ -42,40 +42,40 @@ export default {
   data() {
     return {
       error: false,
-      tabs: [],
+      boards: [],
       title: '',
     }
   },
   created() {
-    this.getTabs()
+    this.getBoards()
   },
   methods: {
-    tabLink(id) {
-      return '/tab/' + id
+    boardLink(id) {
+      return '/board/' + id
     },
-    getTabs() {
+    getBoards() {
       axios({
         method: 'get',
-        url: '/api/db/getTabs',
+        url: '/api/board/getBoards',
       })
         .then(data => {
-          this.tabs = data.data
+          this.boards = data.data
         })
         .catch(error => {
           this.error = error.message
         })
     },
-    createTab(title) {
+    createBoard(title) {
       if (title === '') return
       axios({
         method: 'post',
-        url: '/api/db/createTab',
+        url: '/api/board/createBoard',
         data: {
           title: title,
         },
       })
         .then(data => {
-          this.tabs.push({
+          this.boards.push({
             id: data.data.id,
             title: title,
           })
@@ -84,16 +84,16 @@ export default {
           this.error = error.message
         })
     },
-    deleteTab(id) {
+    deleteBoard(id) {
       axios({
         method: 'post',
-        url: '/api/db/deleteTab',
+        url: '/api/board/deleteBoard',
         data: {
-          tabID: id,
+          boardID: id,
         },
       })
         .then(data => {
-          this.getTabs()
+          this.getBoards()
         })
         .catch(error => {
           this.error = error.message
