@@ -17,8 +17,8 @@ router.post('/login', async (req, res) => {
     return res.status(resp.status).json(resp.data)
 
   const user = {
-    username: req.body.username,
-    id: resp.data.id
+    id: resp.data.id,
+    username: req.body.username
   }
   // Sets session variable (into cookies)
   req.session.user = user
