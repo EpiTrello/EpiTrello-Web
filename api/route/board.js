@@ -6,11 +6,11 @@ var router = express.Router();
 
 /**
  * POST
- * /api/getBoards
+ * /api/board/getBoards
  */
 router.get('/getBoards', async (req, res) => {
   if (!req.session.user)
-    return res.status(400).json({ ok: false, message: "user not auth" })
+    return res.status(401).json({ ok: false, message: "user not auth" })
   const resp = await db.getBoards(req.session.user.id)
   return res.json(resp)
 })
@@ -18,26 +18,26 @@ router.get('/getBoards', async (req, res) => {
 
 /**
  * POST
- * /api/createBoard
+ * /api/board/createBoard
  */
 router.post('/createBoard', async (req, res) => {
   if (!req.session.user)
-    return res.status(400).json({ ok: false, message: "user not auth" })
+    return res.status(401).json({ ok: false, message: "user not auth" })
   if (!req.body.title)
-    return res.status(401).json({ ok: false, message: "missing required fields" })
+    return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.createBoard(req.session.user.id, req.body.title)
   return res.json(resp)
 })
 
 /**
  * POST
- * /api/deleteBoard
+ * /api/board/deleteBoard
  */
 router.post('/deleteBoard', async (req, res) => {
   if (!req.session.user)
-    return res.status(400).json({ ok: false, message: "user not auth" })
+    return res.status(401).json({ ok: false, message: "user not auth" })
   if (!req.body.boardID)
-    return res.status(401).json({ ok: false, message: "missing required fields" })
+    return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.deleteBoard(req.session.user.id, req.body.boardID)
   return res.json(resp)
 })
@@ -45,39 +45,39 @@ router.post('/deleteBoard', async (req, res) => {
 
 /**
  * POST
- * /api/getBoard
+ * /api/board/getBoard
  */
 router.post('/getBoard', async (req, res) => {
   if (!req.session.user)
-    return res.status(400).json({ ok: false, message: "user not auth" })
+    return res.status(401).json({ ok: false, message: "user not auth" })
   if (!req.body.boardID)
-    return res.status(401).json({ ok: false, message: "missing required fields" })
+    return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.getBoard(req.session.user.id, req.body.boardID)
   return res.json(resp)
 })
 
 /**
  * POST
- * /api/createColumn
+ * /api/board/createColumn
  */
 router.post('/createColumn', async (req, res) => {
   if (!req.session.user)
-    return res.status(400).json({ ok: false, message: "user not auth" })
+    return res.status(401).json({ ok: false, message: "user not auth" })
   if (!req.body.boardID || !req.body.title || !req.body.color || !req.body.textColor)
-    return res.status(401).json({ ok: false, message: "missing required fields" })
+    return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.createColumn(req.session.user.id, req.body.boardID, req.body.title, req.body.color, req.body.textColor)
   return res.json(resp)
 })
 
 /**
  * POST
- * /api/deleteColumn
+ * /api/board/deleteColumn
  */
 router.post('/deleteColumn', async (req, res) => {
   if (!req.session.user)
-    return res.status(400).json({ ok: false, message: "user not auth" })
+    return res.status(401).json({ ok: false, message: "user not auth" })
   if (!req.body.columnID)
-    return res.status(401).json({ ok: false, message: "missing required fields" })
+    return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.deleteColumn(req.session.user.id, req.body.columnID)
   return res.json(resp)
 })
@@ -85,26 +85,26 @@ router.post('/deleteColumn', async (req, res) => {
 
 /**
  * POST
- * /api/createCard
+ * /api/board/createCard
  */
 router.post('/createCard', async (req, res) => {
   if (!req.session.user)
-    return res.status(400).json({ ok: false, message: "user not auth" })
+    return res.status(401).json({ ok: false, message: "user not auth" })
   if (!req.body.title || !req.body.columnID || !req.body.color || !req.body.textColor)
-    return res.status(401).json({ ok: false, message: "missing required fields" })
+    return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.createCard(req.session.user.id, req.body.title, req.body.columnID, req.body.color, req.body.textColor)
   return res.json(resp)
 })
 
 /**
  * POST
- * /api/deleteCard
+ * /api/board/deleteCard
  */
 router.post('/deleteCard', async (req, res) => {
   if (!req.session.user)
-    return res.status(400).json({ ok: false, message: "user not auth" })
+    return res.status(401).json({ ok: false, message: "user not auth" })
   if (!req.body.cardID)
-    return res.status(401).json({ ok: false, message: "missing required fields" })
+    return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.deleteCard(req.session.user.id, req.body.cardID)
   return res.json(resp)
 })
@@ -115,9 +115,9 @@ router.post('/deleteCard', async (req, res) => {
  */
 router.post('/leaveBoard', async (req, res) => {
   if (!req.session.user)
-    return res.status(400).json({ ok: false, message: "user not auth" })
+    return res.status(401).json({ ok: false, message: "user not auth" })
   if (!req.body.boardID)
-    return res.status(401).json({ ok: false, message: "missing required fields" })
+    return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.leaveBoard(req.session.user.id, req.body.boardID)
   return res.json(resp)
 })

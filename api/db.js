@@ -156,12 +156,14 @@ async function leaveBoard(user_id, board_id) {
 
 async function searchUser(user_id, user_name) {
   const { rows } = await execQuery(
-    'SELECT * FROM USER_ WHERE username LIKE %$1%',
-    [user_name]
+    'SELECT id, username FROM USER_ WHERE username LIKE $1',
+    ['%' + user_name + '%']
   )
-  // Need to be tested
-  console.log(rows)
   return rows
+}
+
+async function addFriend(user_id, friend_username) {
+
 }
 
 var db = {
@@ -176,7 +178,8 @@ var db = {
   createCard,
   deleteCard,
   leaveBoard,
-  searchUser
+  searchUser,
+  addFriend
 }
 
 module.exports = db

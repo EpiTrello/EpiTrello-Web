@@ -10,10 +10,23 @@ var router = express.Router();
  */
 router.post('/search', async (req, res) => {
   if (!req.session.user)
-    return res.status(400).json({ ok: false, message: "user not auth" })
+    return res.status(401).json({ ok: false, message: "user not auth" })
   if (!req.body.username)
-    return res.status(401).json({ ok: false, message: "missing required fields" })
+    return res.status(400).json({ ok: false, message: "missing required fields" })
   const resp = await db.searchUser(req.session.user.id, req.body.username)
+  return res.json(resp)
+})
+
+/**
+ * POST
+ * /api/user/addFriend
+ */
+router.post('/addFriend', async (req, res) => {
+  if (!req.session.user)
+    return res.status(401).json({ ok: false, message: "user not auth" })
+  if (!req.body.username)
+    return res.status(400).json({ ok: false, message: "missing required fields" })
+  const resp = await db.addFriend(req.session.user.id, req.body.username)
   return res.json(resp)
 })
 
