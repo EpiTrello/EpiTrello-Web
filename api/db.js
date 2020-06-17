@@ -6,8 +6,13 @@ const salt = bcrypt.genSaltSync(saltRounds);
 var pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 
-function execQuery(query, values) {
-  return pool.query(query, values)
+async function execQuery(query, values) {
+  try {
+    const resp = await pool.query(query, values)
+    return resp
+  } catch {
+    return { ok: false, message: "query failed" }
+  }
 }
 
 async function register(username, password) {
@@ -95,7 +100,7 @@ async function getBoard(user_id, board_id) {
   for (var i in rows) {
     rows[i] = await getCards(rows[i])
   }
-  if (rows[0].id == null)
+  if (!rows[0] || rows[0].id == null)
     return [];
   return rows;
 }

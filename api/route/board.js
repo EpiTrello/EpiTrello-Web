@@ -122,17 +122,4 @@ router.post('/leaveBoard', async (req, res) => {
   return res.json(resp)
 })
 
-/**
- * POST
- * /api/searchUser
- */
-router.post('/searchUser', async (req, res) => {
-  if (!req.session.user)
-    return res.status(400).json({ ok: false, message: "user not auth" })
-  if (!req.body.user)
-    return res.status(401).json({ ok: false, message: "missing required fields" })
-  const resp = await db.searchUser(req.session.user.id, req.body.user)
-  return res.json(resp)
-})
-
 module.exports = router;

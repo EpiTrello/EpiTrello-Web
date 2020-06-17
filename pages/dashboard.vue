@@ -56,7 +56,7 @@ export default {
     getBoards() {
       axios({
         method: 'get',
-        url: '/api/getBoards',
+        url: '/api/board/getBoards',
       })
         .then(data => {
           this.boards = data.data
@@ -69,7 +69,7 @@ export default {
       if (title === '') return
       axios({
         method: 'post',
-        url: '/api/createBoard',
+        url: '/api/board/createBoard',
         data: {
           title: title,
         },
@@ -87,7 +87,7 @@ export default {
     deleteBoard(id) {
       axios({
         method: 'post',
-        url: '/api/deleteBoard',
+        url: '/api/board/deleteBoard',
         data: {
           boardID: id,
         },

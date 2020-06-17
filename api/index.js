@@ -16,10 +16,12 @@ router.use((req, res, next) => {
 
 // Routes
 const auth = require('./route/auth');
-const index = require('./route/index');
+const board = require('./route/board');
+const user = require('./route/user');
 
 router.use('/auth', auth)
-router.use('/', index)
+router.use('/board', board)
+router.use('/user', user)
 
 // Export the server middleware
 export default {
