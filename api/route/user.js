@@ -19,14 +19,14 @@ router.post('/search', async (req, res) => {
 
 /**
  * POST
- * /api/user/addFriend
+ * /api/user/addToBoard
  */
-router.post('/addFriend', async (req, res) => {
+router.post('/addToBoard', async (req, res) => {
   if (!req.session.user)
     return res.status(401).json({ message: "user not auth" })
-  if (!req.body.username)
+  if (!req.body.userID || !req.body.boardID)
     return res.status(400).json({ message: "missing required fields" })
-  const resp = await db.addFriend(req.session.user.id, req.body.username)
+  const resp = await db.addToBoard(req.session.user.id, req.body.boardID, req.body.userID)
   return res.status(resp.status).json(resp.data)
 })
 

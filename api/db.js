@@ -152,7 +152,7 @@ async function getBoard(user_id, board_id) {
   }
   if (!rows[0] || rows[0].id == null)
     return makeResp(200);
-  return makeResp(200, rows);
+  return makeResp(200, rows[0]);
 }
 
 async function createColumn(user_id, board_id, title, color, text_color) {
@@ -195,7 +195,7 @@ async function createCard(user_id, title, col_id, color, text_color) {
     'INSERT INTO CARD(TITLE, COLUMN_ID, COLOR, TEXT_COLOR) VALUES($1, $2, $3, $4) RETURNING *;',
     [title, col_id, color, text_color]
   )
-  return makeResp(200, rows)
+  return makeResp(200, rows[0])
 }
 
 async function deleteCard(user_id, card_id) {
@@ -215,16 +215,20 @@ async function deleteCard(user_id, card_id) {
 
 async function leaveBoard(user_id, board_id) {
   // check board access
-  if (await heckHasBoardFromBoardID(board_id, user_id) == false)
+  if (await checkHasBoardFromBoardID(board_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board" })
 
   // leave board
   const { rows } = await execQuery(
-    'DELETE FROM USER_BOARD WHERE USER_ID = $1 AND BOARD_ID = $2',
+    'DELETE FROM USER_BOARD WHERE USER_ID = $1 AND BOARD_ID = $2 RETURNING *',
     [user_id, board_id]
   )
-  // Need to be tested
-  return makeResp(200, rows)
+
+  // delete board if the user is the board owner
+  if (rows[0].owner == true)
+    await deleteBoard(user_id, board_id)
+
+  return makeResp(200, rows[0])
 }
 
 async function searchUser(user_id, user_name) {
@@ -235,16 +239,28 @@ async function searchUser(user_id, user_name) {
   return makeResp(200, rows)
 }
 
-async function addFriend(user_id, friend_username) {
-  const { rows } = await execQuery(
-    'SELECT id FROM USER_ WHERE username = $1',
-    [friend_username]
-  )
-  if (!rows[0])
-    return makeResp(400, { message: 'user not found' })
-  if (rows[0].id == user_id)
+async function addToBoard(user_id, board_id, other_id) {
+  // check board access
+  if (await checkHasBoardFromBoardID(board_id, user_id) == false)
+    return makeResp(403, { message: "you don't have the specified board" })
+
+  // error handler
+  if (user_id == other_id)
     return makeResp(403, { message: 'cannot self-add' })
-  return makeResp(200, rows)
+
+  const r = await execQuery(
+    'SELECT * FROM USER_BOARD WHERE USER_ID = $1 AND BOARD_ID = $2',
+    [other_id, board_id]
+  )
+  if (r.rows[0])
+    return makeResp(403, { message: "user is already in the board" })
+
+  // add to board
+  const { rows } = await execQuery(
+    'INSERT INTO USER_BOARD(USER_ID, BOARD_ID, OWNER) VALUES($1, $2, FALSE) RETURNING *;',
+    [other_id, board_id]
+  )
+  return makeResp(200, rows[0])
 }
 
 var db = {
@@ -260,7 +276,7 @@ var db = {
   deleteCard,
   leaveBoard,
   searchUser,
-  addFriend
+  addToBoard
 }
 
 module.exports = db
