@@ -100,7 +100,7 @@ async function getBoards(user_id) {
 
 async function deleteBoard(user_id, board_id) {
   // check board access
-  if (checkHasBoardFromBoardID(board_id, user_id) == false)
+  if (await checkHasBoardFromBoardID(board_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board" })
 
   // check board ownership
@@ -136,7 +136,7 @@ async function getCards(column) {
 
 async function getBoard(user_id, board_id) {
   // check board access
-  if (checkHasBoardFromBoardID(board_id, user_id) == false)
+  if (await checkHasBoardFromBoardID(board_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board" })
 
   // need to retrieve board name
@@ -157,7 +157,7 @@ async function getBoard(user_id, board_id) {
 
 async function createColumn(user_id, board_id, title, color, text_color) {
   // check board access
-  if (checkHasBoardFromBoardID(board_id, user_id) == false)
+  if (await checkHasBoardFromBoardID(board_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board" })
 
   // create column object
@@ -171,7 +171,7 @@ async function createColumn(user_id, board_id, title, color, text_color) {
 
 async function deleteColumn(user_id, col_id) {
   // check board access
-  if (checkHasBoardFromColID(col_id, user_id) == false)
+  if (await checkHasBoardFromColID(col_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board / column not found" })
 
   // delete column object
@@ -187,7 +187,7 @@ async function deleteColumn(user_id, col_id) {
 
 async function createCard(user_id, title, col_id, color, text_color) {
   // check board access
-  if (checkHasBoardFromColID(col_id, user_id) == false)
+  if (await checkHasBoardFromColID(col_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board / column not found" })
 
   // create card object
@@ -200,7 +200,7 @@ async function createCard(user_id, title, col_id, color, text_color) {
 
 async function deleteCard(user_id, card_id) {
   // check board access
-  if (checkHasBoardFromCardID(card_id, user_id) == false)
+  if (await checkHasBoardFromCardID(card_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board / card not found / column not found" })
 
   // delete card object
@@ -215,7 +215,7 @@ async function deleteCard(user_id, card_id) {
 
 async function leaveBoard(user_id, board_id) {
   // check board access
-  if (checkHasBoardFromBoardID(board_id, user_id) == false)
+  if (await heckHasBoardFromBoardID(board_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board" })
 
   // leave board
