@@ -58,6 +58,19 @@ router.post('/getBoard', async (req, res) => {
 
 /**
  * POST
+ * /api/board/getBoardName
+ */
+router.post('/getBoardName', async (req, res) => {
+  if (!req.session.user)
+    return res.status(401).json({ message: "user not auth" })
+  if (!req.body.boardID)
+    return res.status(400).json({ message: "missing required fields" })
+  const resp = await db.getBoardName(req.session.user.id, req.body.boardID)
+  return res.status(resp.status).json(resp.data)
+})
+
+/**
+ * POST
  * /api/board/createColumn
  */
 router.post('/createColumn', async (req, res) => {

@@ -145,16 +145,26 @@ async function getBoard(user_id, board_id) {
     'SELECT COLUMN_.* FROM BOARD LEFT JOIN COLUMN_ ON COLUMN_.BOARD_ID = BOARD.ID WHERE BOARD.ID = $1',
     [board_id]
   );
-  if (!rows[0])
-    return makeResp(400, { message: "board not found" })
+  rows.title = q.rows[0].title
   for (var i in rows) {
     rows[i] = await getCards(rows[i])
   }
   if (!rows[0] || rows[0].id == null)
-    return makeResp(200);
-  return makeResp(200, rows[0]);
+    return makeResp(200, []);
+  return makeResp(200, rows);
 }
 
+async function getBoardName(user_id, board_id) {
+  // check board access
+  if (await checkHasBoardFromBoardID(board_id, user_id) == false)
+    return makeResp(403, { message: "you don't have the specified board" })
+
+  const { rows } = await execQuery(
+    'SELECT TITLE FROM BOARD WHERE ID = $1',
+    [board_id]
+  )
+  return makeResp(200, rows[0])
+}
 async function createColumn(user_id, board_id, title, color, text_color) {
   // check board access
   if (await checkHasBoardFromBoardID(board_id, user_id) == false)
@@ -270,6 +280,7 @@ var db = {
   createBoard,
   deleteBoard,
   getBoard,
+  getBoardName,
   createColumn,
   deleteColumn,
   createCard,
