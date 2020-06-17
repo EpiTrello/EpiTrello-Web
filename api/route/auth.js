@@ -9,6 +9,7 @@ var router = express.Router();
  * /api/auth/login
  */
 router.post('/login', async (req, res) => {
+  console.log(req.body)
   if (!req.body.username || !req.body.password)
     return res.status(400).json({ ok: false, message: "missing required fields" })
 

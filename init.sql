@@ -35,6 +35,40 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: board; Type: TABLE; Schema: public; Owner: user
+--
+
+CREATE TABLE public.board (
+    id integer NOT NULL,
+    title text NOT NULL
+);
+
+
+ALTER TABLE public.board OWNER TO "user";
+
+--
+-- Name: board_id_seq; Type: SEQUENCE; Schema: public; Owner: user
+--
+
+CREATE SEQUENCE public.board_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.board_id_seq OWNER TO "user";
+
+--
+-- Name: board_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+--
+
+ALTER SEQUENCE public.board_id_seq OWNED BY public.board.id;
+
+
+--
 -- Name: card; Type: TABLE; Schema: public; Owner: user
 --
 
@@ -80,7 +114,7 @@ CREATE TABLE public.column_ (
     title text NOT NULL,
     color text NOT NULL,
     text_color text NOT NULL,
-    table_id integer
+    board_id integer
 );
 
 
@@ -122,40 +156,6 @@ CREATE TABLE public.session (
 ALTER TABLE public.session OWNER TO "user";
 
 --
--- Name: table_; Type: TABLE; Schema: public; Owner: user
---
-
-CREATE TABLE public.table_ (
-    id integer NOT NULL,
-    title text NOT NULL
-);
-
-
-ALTER TABLE public.table_ OWNER TO "user";
-
---
--- Name: table__id_seq; Type: SEQUENCE; Schema: public; Owner: user
---
-
-CREATE SEQUENCE public.table__id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.table__id_seq OWNER TO "user";
-
---
--- Name: table__id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
---
-
-ALTER SEQUENCE public.table__id_seq OWNED BY public.table_.id;
-
-
---
 -- Name: user_; Type: TABLE; Schema: public; Owner: user
 --
 
@@ -191,24 +191,24 @@ ALTER SEQUENCE public.user__id_seq OWNED BY public.user_.id;
 
 
 --
--- Name: user_table; Type: TABLE; Schema: public; Owner: user
+-- Name: user_board; Type: TABLE; Schema: public; Owner: user
 --
 
-CREATE TABLE public.user_table (
+CREATE TABLE public.user_board (
     id integer NOT NULL,
     user_id integer,
-    table_id integer,
+    board_id integer,
     owner boolean NOT NULL
 );
 
 
-ALTER TABLE public.user_table OWNER TO "user";
+ALTER TABLE public.user_board OWNER TO "user";
 
 --
--- Name: user_table_id_seq; Type: SEQUENCE; Schema: public; Owner: user
+-- Name: user_board_id_seq; Type: SEQUENCE; Schema: public; Owner: user
 --
 
-CREATE SEQUENCE public.user_table_id_seq
+CREATE SEQUENCE public.user_board_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -217,13 +217,20 @@ CREATE SEQUENCE public.user_table_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.user_table_id_seq OWNER TO "user";
+ALTER TABLE public.user_board_id_seq OWNER TO "user";
 
 --
--- Name: user_table_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+-- Name: user_board_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
 --
 
-ALTER SEQUENCE public.user_table_id_seq OWNED BY public.user_table.id;
+ALTER SEQUENCE public.user_board_id_seq OWNED BY public.user_board.id;
+
+
+--
+-- Name: board id; Type: DEFAULT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.board ALTER COLUMN id SET DEFAULT nextval('public.board_id_seq'::regclass);
 
 
 --
@@ -241,13 +248,6 @@ ALTER TABLE ONLY public.column_ ALTER COLUMN id SET DEFAULT nextval('public.colu
 
 
 --
--- Name: table_ id; Type: DEFAULT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.table_ ALTER COLUMN id SET DEFAULT nextval('public.table__id_seq'::regclass);
-
-
---
 -- Name: user_ id; Type: DEFAULT; Schema: public; Owner: user
 --
 
@@ -255,10 +255,18 @@ ALTER TABLE ONLY public.user_ ALTER COLUMN id SET DEFAULT nextval('public.user__
 
 
 --
--- Name: user_table id; Type: DEFAULT; Schema: public; Owner: user
+-- Name: user_board id; Type: DEFAULT; Schema: public; Owner: user
 --
 
-ALTER TABLE ONLY public.user_table ALTER COLUMN id SET DEFAULT nextval('public.user_table_id_seq'::regclass);
+ALTER TABLE ONLY public.user_board ALTER COLUMN id SET DEFAULT nextval('public.user_board_id_seq'::regclass);
+
+
+--
+-- Data for Name: board; Type: TABLE DATA; Schema: public; Owner: user
+--
+
+COPY public.board (id, title) FROM stdin;
+\.
 
 
 --
@@ -273,7 +281,7 @@ COPY public.card (id, title, color, text_color, column_id) FROM stdin;
 -- Data for Name: column_; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.column_ (id, title, color, text_color, table_id) FROM stdin;
+COPY public.column_ (id, title, color, text_color, board_id) FROM stdin;
 \.
 
 
@@ -286,14 +294,6 @@ COPY public.session (sid, sess, expire) FROM stdin;
 
 
 --
--- Data for Name: table_; Type: TABLE DATA; Schema: public; Owner: user
---
-
-COPY public.table_ (id, title) FROM stdin;
-\.
-
-
---
 -- Data for Name: user_; Type: TABLE DATA; Schema: public; Owner: user
 --
 
@@ -302,11 +302,18 @@ COPY public.user_ (id, username, password) FROM stdin;
 
 
 --
--- Data for Name: user_table; Type: TABLE DATA; Schema: public; Owner: user
+-- Data for Name: user_board; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.user_table (id, user_id, table_id, owner) FROM stdin;
+COPY public.user_board (id, user_id, board_id, owner) FROM stdin;
 \.
+
+
+--
+-- Name: board_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
+--
+
+SELECT pg_catalog.setval('public.board_id_seq', 1, false);
 
 
 --
@@ -324,13 +331,6 @@ SELECT pg_catalog.setval('public.column__id_seq', 1, false);
 
 
 --
--- Name: table__id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
---
-
-SELECT pg_catalog.setval('public.table__id_seq', 1, false);
-
-
---
 -- Name: user__id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
@@ -338,10 +338,18 @@ SELECT pg_catalog.setval('public.user__id_seq', 1, false);
 
 
 --
--- Name: user_table_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
+-- Name: user_board_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.user_table_id_seq', 1, false);
+SELECT pg_catalog.setval('public.user_board_id_seq', 1, false);
+
+
+--
+-- Name: board board_pkey; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.board
+    ADD CONSTRAINT board_pkey PRIMARY KEY (id);
 
 
 --
@@ -369,14 +377,6 @@ ALTER TABLE ONLY public.session
 
 
 --
--- Name: table_ table__pkey; Type: CONSTRAINT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.table_
-    ADD CONSTRAINT table__pkey PRIMARY KEY (id);
-
-
---
 -- Name: user_ user__pkey; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
@@ -393,11 +393,11 @@ ALTER TABLE ONLY public.user_
 
 
 --
--- Name: user_table user_table_pkey; Type: CONSTRAINT; Schema: public; Owner: user
+-- Name: user_board user_board_pkey; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
-ALTER TABLE ONLY public.user_table
-    ADD CONSTRAINT user_table_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.user_board
+    ADD CONSTRAINT user_board_pkey PRIMARY KEY (id);
 
 
 --
@@ -409,27 +409,27 @@ ALTER TABLE ONLY public.card
 
 
 --
--- Name: column_ column__table_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
+-- Name: column_ column__board_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.column_
-    ADD CONSTRAINT column__table_id_fkey FOREIGN KEY (table_id) REFERENCES public.table_(id) ON DELETE CASCADE;
+    ADD CONSTRAINT column__board_id_fkey FOREIGN KEY (board_id) REFERENCES public.board(id) ON DELETE CASCADE;
 
 
 --
--- Name: user_table user_table_table_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
+-- Name: user_board user_board_board_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
 --
 
-ALTER TABLE ONLY public.user_table
-    ADD CONSTRAINT user_table_table_id_fkey FOREIGN KEY (table_id) REFERENCES public.table_(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.user_board
+    ADD CONSTRAINT user_board_board_id_fkey FOREIGN KEY (board_id) REFERENCES public.board(id) ON DELETE CASCADE;
 
 
 --
--- Name: user_table user_table_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
+-- Name: user_board user_board_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
 --
 
-ALTER TABLE ONLY public.user_table
-    ADD CONSTRAINT user_table_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.user_(id);
+ALTER TABLE ONLY public.user_board
+    ADD CONSTRAINT user_board_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.user_(id);
 
 
 --

@@ -108,9 +108,9 @@ export default {
       this.columns = []
       axios({
         method: 'post',
-        url: '/api/getTab',
+        url: '/api/getBoard',
         data: {
-          tabID: this.id,
+          boardID: this.id,
         },
       })
         .then(data => {
@@ -125,7 +125,7 @@ export default {
         method: 'post',
         url: '/api/createColumn',
         data: {
-          tabID: this.id,
+          boardID: this.id,
           title: title,
           color: color,
           textColor: textColor,
