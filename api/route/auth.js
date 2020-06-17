@@ -34,6 +34,7 @@ router.post('/login', async (req, res) => {
 router.post('/logout', (req, res) => {
   delete req.session.user
   delete req.session.loggedIn
+  res.clearCookie('connect.sid');
   res.json({ ok: true })
 })
 
