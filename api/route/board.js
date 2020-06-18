@@ -76,9 +76,9 @@ router.post('/getBoardName', async (req, res) => {
 router.post('/createColumn', async (req, res) => {
   if (!req.session.user)
     return res.status(401).json({ message: "user not auth" })
-  if (!req.body.boardID || !req.body.title || !req.body.color || !req.body.textColor)
+  if (!req.body.boardID || !req.body.title || !req.body.color || !req.body.textColor || req.body.position == undefined)
     return res.status(400).json({ message: "missing required fields" })
-  const resp = await db.createColumn(req.session.user.id, req.body.boardID, req.body.title, req.body.color, req.body.textColor)
+  const resp = await db.createColumn(req.session.user.id, req.body.boardID, req.body.title, req.body.color, req.body.textColor, req.body.position)
   return res.status(resp.status).json(resp.data)
 })
 
@@ -103,9 +103,9 @@ router.post('/deleteColumn', async (req, res) => {
 router.post('/createCard', async (req, res) => {
   if (!req.session.user)
     return res.status(401).json({ message: "user not auth" })
-  if (!req.body.title || !req.body.columnID || !req.body.color || !req.body.textColor)
+  if (!req.body.title || !req.body.columnID || !req.body.color || !req.body.textColor || req.body.position == undefined)
     return res.status(400).json({ message: "missing required fields" })
-  const resp = await db.createCard(req.session.user.id, req.body.title, req.body.columnID, req.body.color, req.body.textColor)
+  const resp = await db.createCard(req.session.user.id, req.body.title, req.body.columnID, req.body.color, req.body.textColor, req.body.position)
   return res.status(resp.status).json(resp.data)
 })
 

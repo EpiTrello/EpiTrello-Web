@@ -77,6 +77,7 @@ CREATE TABLE public.card (
     title text NOT NULL,
     color text NOT NULL,
     text_color text NOT NULL,
+    "position" integer NOT NULL,
     column_id integer
 );
 
@@ -114,6 +115,7 @@ CREATE TABLE public.column_ (
     title text NOT NULL,
     color text NOT NULL,
     text_color text NOT NULL,
+    "position" integer NOT NULL,
     board_id integer
 );
 
@@ -273,7 +275,7 @@ COPY public.board (id, title) FROM stdin;
 -- Data for Name: card; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.card (id, title, color, text_color, column_id) FROM stdin;
+COPY public.card (id, title, color, text_color, "position", column_id) FROM stdin;
 \.
 
 
@@ -281,7 +283,7 @@ COPY public.card (id, title, color, text_color, column_id) FROM stdin;
 -- Data for Name: column_; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.column_ (id, title, color, text_color, board_id) FROM stdin;
+COPY public.column_ (id, title, color, text_color, "position", board_id) FROM stdin;
 \.
 
 

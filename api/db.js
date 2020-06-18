@@ -19,7 +19,7 @@ function execQuery(query, values) {
 
 async function checkHasBoardFromBoardID(board_id, user_id) {
   const board = await execQuery(
-    'SELECT BOARD.ID FROM USER_BOARD LEFT JOIN BOARD ON USER_BOARD.BOARD_ID = BOARD.ID WHERE USER_BOARD.USER_ID = $1 AND USER_BOARD.OWNER = TRUE',
+    'SELECT BOARD.ID FROM USER_BOARD LEFT JOIN BOARD ON USER_BOARD.BOARD_ID = BOARD.ID WHERE USER_BOARD.USER_ID = $1',
     [user_id]
   )
   if (!board.rows[0])
@@ -49,7 +49,7 @@ async function checkHasBoardFromCardID(card_id, user_id) {
   )
   if (!card.rows[0])
     return false
-  return checkHasBoardFromColID(card.rows[0].column_id)
+  return checkHasBoardFromColID(card.rows[0].column_id, user_id)
 }
 
 async function register(username, password) {
@@ -139,13 +139,11 @@ async function getBoard(user_id, board_id) {
   if (await checkHasBoardFromBoardID(board_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board" })
 
-  // need to retrieve board name
   // get board data
   const { rows } = await execQuery(
     'SELECT COLUMN_.* FROM BOARD LEFT JOIN COLUMN_ ON COLUMN_.BOARD_ID = BOARD.ID WHERE BOARD.ID = $1',
     [board_id]
   );
-  rows.title = q.rows[0].title
   for (var i in rows) {
     rows[i] = await getCards(rows[i])
   }
@@ -159,23 +157,23 @@ async function getBoardName(user_id, board_id) {
   if (await checkHasBoardFromBoardID(board_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board" })
 
+  // get board name
   const { rows } = await execQuery(
     'SELECT TITLE FROM BOARD WHERE ID = $1',
     [board_id]
   )
   return makeResp(200, rows[0])
 }
-async function createColumn(user_id, board_id, title, color, text_color) {
+async function createColumn(user_id, board_id, title, color, text_color, position) {
   // check board access
   if (await checkHasBoardFromBoardID(board_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board" })
 
   // create column object
   const { rows } = await execQuery(
-    'INSERT INTO COLUMN_(TITLE, BOARD_ID, COLOR, TEXT_COLOR) VALUES($1, $2, $3, $4) RETURNING *;',
-    [title, board_id, color, text_color]
+    'INSERT INTO COLUMN_(TITLE, BOARD_ID, COLOR, TEXT_COLOR, POSITION) VALUES($1, $2, $3, $4, $5) RETURNING *;',
+    [title, board_id, color, text_color, position]
   )
-  rows.status = 200
   return makeResp(200, { id: rows[0].id })
 }
 
@@ -195,27 +193,28 @@ async function deleteColumn(user_id, col_id) {
 }
 
 
-async function createCard(user_id, title, col_id, color, text_color) {
+async function createCard(user_id, title, col_id, color, text_color, position) {
   // check board access
   if (await checkHasBoardFromColID(col_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board / column not found" })
 
   // create card object
   const { rows } = await execQuery(
-    'INSERT INTO CARD(TITLE, COLUMN_ID, COLOR, TEXT_COLOR) VALUES($1, $2, $3, $4) RETURNING *;',
-    [title, col_id, color, text_color]
+    'INSERT INTO CARD(TITLE, COLUMN_ID, COLOR, TEXT_COLOR, POSITION) VALUES($1, $2, $3, $4, $5) RETURNING *;',
+    [title, col_id, color, text_color, position]
   )
   return makeResp(200, rows[0])
 }
 
 async function deleteCard(user_id, card_id) {
   // check board access
-  if (await checkHasBoardFromCardID(card_id, user_id) == false)
+  if (await checkHasBoardFromCardID(card_id, user_id) == false) {
     return makeResp(403, { message: "you don't have the specified board / card not found / column not found" })
+  }
 
   // delete card object
   const { rows } = await execQuery(
-    'DELETE FROM CARD WHERE ID = $1',
+    'DELETE FROM CARD WHERE ID = $1 RETURNING *',
     [card_id]
   )
   if (!rows[0])
