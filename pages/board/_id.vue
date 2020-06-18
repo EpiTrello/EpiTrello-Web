@@ -129,6 +129,7 @@ export default {
           title: title,
           color: color,
           textColor: textColor,
+          position: 0, // A MODIFIER
         },
       })
         .then(data => {
@@ -162,6 +163,7 @@ export default {
           columnID: columnID,
           color: color,
           textColor: textColor,
+          position: 0 // A MODIFIER
         },
       })
         .then(data => {
