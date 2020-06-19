@@ -64,7 +64,7 @@ export default {
     // module options
     sockets: [{
       name: 'default',
-      url: 'http://0.0.0.0:' + process.env.NUXT_PORT,
+      url: 'https://epi-trello.herokuapp.com/',
       default: true,
     }]
   },
