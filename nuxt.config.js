@@ -64,7 +64,7 @@ export default {
     // module options
     sockets: [{
       name: 'default',
-      url: 'https://epi-trello.herokuapp.com',
+      url: process.env.HEROKU_URL ? process.env.HEROKU_URL : 'http://localhost:5000',
       default: true,
     }]
   },
