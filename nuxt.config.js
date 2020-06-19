@@ -46,12 +46,27 @@ export default {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
+    // Doc: https://nuxt-socket-io.netlify.app/
+    'nuxt-socket-io'
   ],
   /*
   ** Axios module configuration
   ** See https://axios.nuxtjs.org/options
   */
   axios: {
+  },
+  /*
+  ** IO module configuation
+  ** See https://github.com/richardeschloss/nuxt-socket-io
+  */
+  io: {
+    warnings: false,
+    // module options
+    sockets: [{
+      name: 'default',
+      url: 'http://localhost:' + process.env.PORT,
+      default: true,
+    }]
   },
   /*
   ** Server Middleware

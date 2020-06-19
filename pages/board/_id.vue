@@ -9,14 +9,19 @@
         <v-card class="mylist mr-2 mb-2 px-5" :color="column.color">
           <v-card-title class="px-0">{{ column.title }}</v-card-title>
           <!-- each cards -->
-          <v-card class="my-custom-card mb-3" v-for="card in column.cards" :key="card.id" :color="card.color">
+          <v-card
+            class="my-custom-card mb-3"
+            v-for="card in column.cards"
+            :key="card.id"
+            :color="card.color"
+          >
             <v-layout column class="pa-4 ma-0">
               <h3>{{ card.title }}</h3>
               <v-card-actions class="ma-0 pa-0">
                 <v-spacer />
                 <!-- <v-btn @click="cardColorSwitcher()" color="brown" fab x-small dark>
                   <v-icon>mdi-invert-colors</v-icon>
-                </v-btn> -->
+                </v-btn>-->
                 <v-btn @click="deleteCard(card.id)" color="#561705" fab x-small dark>
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
@@ -28,7 +33,10 @@
           <v-card class="my-card" color="#272727">
             <v-layout column class="pb-5 px-5 my-3">
               <v-text-field v-model="column.newCardTitle" placeholder="Nom de la carte"></v-text-field>
-              <v-btn color="#363636" @click="createCard(column.newCardTitle, column.id, '#272727', '#ffffff')">Créer une carte</v-btn>
+              <v-btn
+                color="#363636"
+                @click="createCard(column.newCardTitle, column.id, '#272727', '#ffffff')"
+              >Créer une carte</v-btn>
             </v-layout>
           </v-card>
 
@@ -56,8 +64,7 @@
                 show-swatches
                 v-model="column.color"
                 flat
-              >
-              </v-color-picker>
+              ></v-color-picker>
             </v-layout>
           </div>
         </v-card>
@@ -76,137 +83,153 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 
 export default {
   async asyncData({ app, params, redirect }) {
     return {
-      id: params.id,
-    }
+      id: params.id
+    };
   },
   data() {
     return {
       error: false,
       colorPickerColumn: false,
       // colorPickerCard: false,
-      columnTitle: '',
+      columnTitle: "",
       columns: [],
       swatches: [
-        ['#FF0000', '#AA0000', '#550000'],
-        ['#FFFF00', '#AAAA00', '#555500'],
-        ['#00FF00', '#00AA00', '#005500'],
-        ['#00FFFF', '#00AAAA', '#005555'],
-        ['#0000FF', '#0000AA', '#000055'],
-      ],
-    }
+        ["#FF0000", "#AA0000", "#550000"],
+        ["#FFFF00", "#AAAA00", "#555500"],
+        ["#00FF00", "#00AA00", "#005500"],
+        ["#00FFFF", "#00AAAA", "#005555"],
+        ["#0000FF", "#0000AA", "#000055"]
+      ]
+    };
+  },
+  mounted() {
+    this.socket = this.$nuxtSocket({
+      name: this.id,
+      channel: "/board"
+    });
+    this.socket.emit('join', this.id)
+    this.socket.on("refresh", (msg, cb) => {
+      this.refresh();
+    });
   },
   created() {
-    this.refresh()
+    this.refresh();
   },
   methods: {
+    emitSocket(method) {
+      this.socket.emit(method, this.id, resp => {
+        /* Handle response, if any */
+      });
+    },
     refresh() {
-      this.columns = []
+      this.columns = [];
       axios({
-        method: 'post',
-        url: '/api/board/getBoard',
+        method: "post",
+        url: "/api/board/getBoard",
         data: {
-          boardID: this.id,
-        },
+          boardID: this.id
+        }
       })
         .then(data => {
-          this.columns = data.data
+          this.columns = data.data;
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
     createColumn(title, color, textColor) {
       axios({
-        method: 'post',
-        url: '/api/board/createColumn',
+        method: "post",
+        url: "/api/board/createColumn",
         data: {
           boardID: this.id,
           title: title,
           color: color,
           textColor: textColor,
-          position: 0, // A MODIFIER
-        },
+          position: 0 // A MODIFIER
+        }
       })
         .then(data => {
-          this.refresh()
+          this.emitSocket("refresh");
+          // this.refresh();
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
     deleteColumn(id) {
       axios({
-        method: 'post',
-        url: '/api/board/deleteColumn',
+        method: "post",
+        url: "/api/board/deleteColumn",
         data: {
-          columnID: id,
-        },
+          columnID: id
+        }
       })
         .then(data => {
-          this.refresh()
+          this.emitSocket("refresh");
+          // this.refresh();
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
     createCard(title, columnID, color, textColor) {
       axios({
-        method: 'post',
-        url: '/api/board/createCard',
+        method: "post",
+        url: "/api/board/createCard",
         data: {
           title: title,
           columnID: columnID,
           color: color,
           textColor: textColor,
           position: 0 // A MODIFIER
-        },
+        }
       })
         .then(data => {
-          this.refresh()
+          this.emitSocket("refresh");
+          // this.refresh();
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
-
     deleteCard(cardID) {
       axios({
-        method: 'post',
-        url: '/api/board/deleteCard',
+        method: "post",
+        url: "/api/board/deleteCard",
         data: {
-          cardID: cardID,
-        },
+          cardID: cardID
+        }
       })
         .then(data => {
-          this.refresh()
+          this.emitSocket("refresh");
+          // this.refresh();
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
-
     columnColorSwitcher() {
       if (this.colorPickerColumn) {
-        this.colorPickerColumn = false
+        this.colorPickerColumn = false;
       } else {
-        this.colorPickerColumn = true
+        this.colorPickerColumn = true;
       }
     },
-
     cardColorSwitcher() {
       if (this.colorPickerCard) {
-        this.colorPickerCard = false
+        this.colorPickerCard = false;
       } else {
-        this.colorPickerCard = true
+        this.colorPickerCard = true;
       }
-    },
-  },
-}
+    }
+  }
+};
 </script>
 
 <style scoped>
