@@ -64,7 +64,7 @@ export default {
     // module options
     sockets: [{
       name: 'default',
-      url: 'https://epi-trello.herokuapp.com/',
+      url: 'https://epi-trello.herokuapp.com',
       default: true,
     }]
   },
