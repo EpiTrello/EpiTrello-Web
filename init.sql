@@ -107,6 +107,41 @@ ALTER SEQUENCE public.card_id_seq OWNED BY public.card.id;
 
 
 --
+-- Name: card_tag; Type: TABLE; Schema: public; Owner: user
+--
+
+CREATE TABLE public.card_tag (
+    id integer NOT NULL,
+    card_id integer,
+    tag_id integer
+);
+
+
+ALTER TABLE public.card_tag OWNER TO "user";
+
+--
+-- Name: card_tag_id_seq; Type: SEQUENCE; Schema: public; Owner: user
+--
+
+CREATE SEQUENCE public.card_tag_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.card_tag_id_seq OWNER TO "user";
+
+--
+-- Name: card_tag_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+--
+
+ALTER SEQUENCE public.card_tag_id_seq OWNED BY public.card_tag.id;
+
+
+--
 -- Name: column_; Type: TABLE; Schema: public; Owner: user
 --
 
@@ -156,6 +191,41 @@ CREATE TABLE public.session (
 
 
 ALTER TABLE public.session OWNER TO "user";
+
+--
+-- Name: tag; Type: TABLE; Schema: public; Owner: user
+--
+
+CREATE TABLE public.tag (
+    id integer NOT NULL,
+    title text NOT NULL,
+    board_id integer
+);
+
+
+ALTER TABLE public.tag OWNER TO "user";
+
+--
+-- Name: tag_id_seq; Type: SEQUENCE; Schema: public; Owner: user
+--
+
+CREATE SEQUENCE public.tag_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tag_id_seq OWNER TO "user";
+
+--
+-- Name: tag_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+--
+
+ALTER SEQUENCE public.tag_id_seq OWNED BY public.tag.id;
+
 
 --
 -- Name: user_; Type: TABLE; Schema: public; Owner: user
@@ -243,10 +313,24 @@ ALTER TABLE ONLY public.card ALTER COLUMN id SET DEFAULT nextval('public.card_id
 
 
 --
+-- Name: card_tag id; Type: DEFAULT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.card_tag ALTER COLUMN id SET DEFAULT nextval('public.card_tag_id_seq'::regclass);
+
+
+--
 -- Name: column_ id; Type: DEFAULT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.column_ ALTER COLUMN id SET DEFAULT nextval('public.column__id_seq'::regclass);
+
+
+--
+-- Name: tag id; Type: DEFAULT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.tag ALTER COLUMN id SET DEFAULT nextval('public.tag_id_seq'::regclass);
 
 
 --
@@ -280,6 +364,14 @@ COPY public.card (id, title, color, text_color, "position", column_id) FROM stdi
 
 
 --
+-- Data for Name: card_tag; Type: TABLE DATA; Schema: public; Owner: user
+--
+
+COPY public.card_tag (id, card_id, tag_id) FROM stdin;
+\.
+
+
+--
 -- Data for Name: column_; Type: TABLE DATA; Schema: public; Owner: user
 --
 
@@ -292,6 +384,14 @@ COPY public.column_ (id, title, color, text_color, "position", board_id) FROM st
 --
 
 COPY public.session (sid, sess, expire) FROM stdin;
+\.
+
+
+--
+-- Data for Name: tag; Type: TABLE DATA; Schema: public; Owner: user
+--
+
+COPY public.tag (id, title, board_id) FROM stdin;
 \.
 
 
@@ -326,10 +426,24 @@ SELECT pg_catalog.setval('public.card_id_seq', 1, false);
 
 
 --
+-- Name: card_tag_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
+--
+
+SELECT pg_catalog.setval('public.card_tag_id_seq', 1, false);
+
+
+--
 -- Name: column__id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
 SELECT pg_catalog.setval('public.column__id_seq', 1, false);
+
+
+--
+-- Name: tag_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
+--
+
+SELECT pg_catalog.setval('public.tag_id_seq', 1, false);
 
 
 --
@@ -363,6 +477,14 @@ ALTER TABLE ONLY public.card
 
 
 --
+-- Name: card_tag card_tag_pkey; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.card_tag
+    ADD CONSTRAINT card_tag_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: column_ column__pkey; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
@@ -376,6 +498,14 @@ ALTER TABLE ONLY public.column_
 
 ALTER TABLE ONLY public.session
     ADD CONSTRAINT session_pkey PRIMARY KEY (sid);
+
+
+--
+-- Name: tag tag_pkey; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.tag
+    ADD CONSTRAINT tag_pkey PRIMARY KEY (id);
 
 
 --
@@ -411,11 +541,35 @@ ALTER TABLE ONLY public.card
 
 
 --
+-- Name: card_tag card_tag_card_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.card_tag
+    ADD CONSTRAINT card_tag_card_id_fkey FOREIGN KEY (card_id) REFERENCES public.card(id);
+
+
+--
+-- Name: card_tag card_tag_tag_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.card_tag
+    ADD CONSTRAINT card_tag_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public.tag(id);
+
+
+--
 -- Name: column_ column__board_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.column_
     ADD CONSTRAINT column__board_id_fkey FOREIGN KEY (board_id) REFERENCES public.board(id) ON DELETE CASCADE;
+
+
+--
+-- Name: tag tag_board_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.tag
+    ADD CONSTRAINT tag_board_id_fkey FOREIGN KEY (board_id) REFERENCES public.board(id);
 
 
 --

@@ -6,7 +6,12 @@
     <v-layout column class="mycontainer mx-auto">
       <h1>{{boardName}}</h1>
       <div class="my-2">
-        Membres du tableau : <strong class="user" v-for="user in users" :key="user.id">{{ user.username }} </strong>
+        Membres du tableau :
+        <strong
+          class="user"
+          v-for="user in users"
+          :key="user.id"
+        >{{ user.username }}</strong>
       </div>
       <v-layout row>
         <!-- each column -->
@@ -14,14 +19,19 @@
           <v-card class="mylist mr-2 mb-2 px-5" :color="column.color">
             <v-card-title class="px-0">{{ column.title }}</v-card-title>
             <!-- each cards -->
-            <v-card class="my-custom-card mb-3" v-for="card in column.cards" :key="card.id" :color="card.color">
+            <v-card
+              class="my-custom-card mb-3"
+              v-for="card in column.cards"
+              :key="card.id"
+              :color="card.color"
+            >
               <v-layout column class="pa-4 ma-0">
                 <h3>{{ card.title }}</h3>
                 <v-card-actions class="ma-0 pa-0">
                   <v-spacer />
                   <!-- <v-btn @click="cardColorSwitcher()" color="brown" fab x-small dark>
                   <v-icon>mdi-invert-colors</v-icon>
-                </v-btn>-->
+                  </v-btn>-->
                   <v-btn @click="deleteCard(card.id)" color="#561705" fab x-small dark>
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
@@ -33,14 +43,23 @@
             <v-card class="my-card" color="#272727">
               <v-layout column class="pb-5 px-5 my-3">
                 <v-text-field v-model="column.newCardTitle" placeholder="Nom de la carte"></v-text-field>
-                <v-btn color="#363636" @click="createCard(column.newCardTitle, column.id, '#272727', '#ffffff')">Créer une carte</v-btn>
+                <v-btn
+                  color="#363636"
+                  @click="createCard(column.newCardTitle, column.id, '#272727', '#ffffff')"
+                >Créer une carte</v-btn>
               </v-layout>
             </v-card>
 
             <!-- /create Card -->
             <v-card-actions class="ma-0 pa-0 py-4">
               <v-spacer />
-              <v-btn @click="columnColorSwitcher(column.id, column.color, column.position)" color="warning" fab x-small dark>
+              <v-btn
+                @click="columnColorSwitcher(column.id, column.color, column.position)"
+                color="warning"
+                fab
+                x-small
+                dark
+              >
                 <v-icon>mdi-invert-colors</v-icon>
               </v-btn>
               <v-btn @click="deleteColumn(column.id)" color="error" fab x-small dark>
@@ -81,6 +100,17 @@
               <v-btn @click="addUser(userToAdd)">Ajouter un utilisateur</v-btn>
             </v-layout>
           </v-card>
+          <!-- create tag -->
+          <v-card class="mt-2">
+            <v-layout column class="pb-5 px-5">
+              <div v-for="tag in tags" :key="tag.id">
+                <p>{{ tag.title }}</p>
+              </div>
+              <v-text-field v-model="tagToAdd" placeholder="Nom du tag"></v-text-field>
+              <v-btn @click="createTag(tagToAdd)">Ajouter un tag</v-btn>
+            </v-layout>
+          </v-card>
+          <!-- /create tag -->
         </v-layout>
         <!-- /create column -->
       </v-layout>
@@ -89,232 +119,261 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 
 export default {
   async asyncData({ app, params, redirect }) {
     return {
-      id: params.id,
-    }
+      id: params.id
+    };
   },
   data() {
     return {
       error: false,
-      boardName: '',
-      userToAdd: '',
+      boardName: "",
+      userToAdd: "",
       users: [],
       colorPickerColumn: false,
       // colorPickerCard: false,
-      columnTitle: '',
+      columnTitle: "",
       columns: [],
       swatches: [
-        ['#FF0000', '#AA0000', '#550000'],
-        ['#FFFF00', '#AAAA00', '#555500'],
-        ['#00FF00', '#00AA00', '#005500'],
-        ['#00FFFF', '#00AAAA', '#005555'],
-        ['#0000FF', '#0000AA', '#000055'],
-      ],
-    }
+        ["#FF0000", "#AA0000", "#550000"],
+        ["#FFFF00", "#AAAA00", "#555500"],
+        ["#00FF00", "#00AA00", "#005500"],
+        ["#00FFFF", "#00AAAA", "#005555"],
+        ["#0000FF", "#0000AA", "#000055"]
+      ]
+    };
   },
   mounted() {
     this.socket = this.$nuxtSocket({
       name: this.id,
-      channel: '/board',
-    })
-    this.socket.emit('join', this.id)
-    this.socket.on('refresh', (msg, cb) => {
-      this.refresh()
-    })
+      channel: "/board"
+    });
+    this.socket.emit("join", this.id);
+    this.socket.on("refresh", (msg, cb) => {
+      this.refresh();
+    });
   },
   created() {
-    this.refresh()
+    this.refresh();
   },
   methods: {
     emitSocket(method) {
       this.socket.emit(method, this.id, resp => {
         /* Handle response, if any */
-      })
+      });
     },
     refresh() {
-      this.columns = []
-      this.getBoardName(this.id)
-      this.getUsers(this.$store.state.user.id, this.id)
+      this.columns = [];
+      this.getBoardName(this.id);
+      this.getAllTags();
+      this.getUsers(this.$store.state.user.id, this.id);
       axios({
-        method: 'post',
-        url: '/api/board/getID',
+        method: "post",
+        url: "/api/board/getID",
         data: {
-          boardID: this.id,
-        },
+          boardID: this.id
+        }
       })
         .then(data => {
-          this.columns = data.data
+          this.columns = data.data;
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
     createColumn(title, color, textColor) {
       axios({
-        method: 'post',
-        url: '/api/column/create',
+        method: "post",
+        url: "/api/column/create",
         data: {
           boardID: this.id,
           title: title,
           color: color,
           textColor: textColor,
-          position: 0, // A MODIFIER
-        },
+          position: 0 // A MODIFIER
+        }
       })
         .then(data => {
-          this.emitSocket('refresh')
-          // this.refresh();
+          this.emitSocket("refresh");
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
     deleteColumn(id) {
       axios({
-        method: 'post',
-        url: '/api/column/delete',
+        method: "post",
+        url: "/api/column/delete",
         data: {
-          columnID: id,
-        },
+          columnID: id
+        }
       })
         .then(data => {
-          this.emitSocket('refresh')
-          // this.refresh();
+          this.emitSocket("refresh");
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
     createCard(title, columnID, color, textColor) {
       axios({
-        method: 'post',
-        url: '/api/card/create',
+        method: "post",
+        url: "/api/card/create",
         data: {
           title: title,
           columnID: columnID,
           color: color,
           textColor: textColor,
-          position: 0, // A MODIFIER
-        },
+          position: 0 // A MODIFIER
+        }
       })
         .then(data => {
-          this.emitSocket('refresh')
-          // this.refresh();
+          this.emitSocket("refresh");
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
     deleteCard(cardID) {
       axios({
-        method: 'post',
-        url: '/api/card/delete',
+        method: "post",
+        url: "/api/card/delete",
         data: {
-          cardID: cardID,
-        },
+          cardID: cardID
+        }
       })
         .then(data => {
-          this.emitSocket('refresh')
-          // this.refresh();
+          this.emitSocket("refresh");
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
     columnColorSwitcher(id, color, position) {
       if (this.colorPickerColumn) {
-        this.colorPickerColumn = false
-        this.modifyColumn(id, color)
+        this.colorPickerColumn = false;
+        this.modifyColumn(id, color);
       } else {
-        this.colorPickerColumn = true
+        this.colorPickerColumn = true;
       }
     },
     cardColorSwitcher() {
       if (this.colorPickerCard) {
-        this.colorPickerCard = false
+        this.colorPickerCard = false;
       } else {
-        this.colorPickerCard = true
+        this.colorPickerCard = true;
       }
     },
     async search(user) {
       var data = await axios({
-        method: 'post',
-        url: '/api/user/search',
+        method: "post",
+        url: "/api/user/search",
         data: {
-          username: user,
-        },
-      })
-      return data.data[0].id
+          username: user
+        }
+      });
+      return data.data[0].id;
     },
     async addUser(username) {
-      var id = await this.search(username)
+      var id = await this.search(username);
       axios({
-        method: 'post',
-        url: '/api/board/addUser',
+        method: "post",
+        url: "/api/board/addUser",
         data: {
           userID: id,
-          boardID: this.id,
-        },
+          boardID: this.id
+        }
       })
         .then(data => {})
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
     getUsers(user_id, board_id) {
       axios({
-        method: 'post',
-        url: '/api/board/getUsers',
+        method: "post",
+        url: "/api/board/getUsers",
         data: {
           userID: user_id,
-          boardID: board_id,
-        },
+          boardID: board_id
+        }
       })
         .then(data => {
-          this.users = data.data
+          this.users = data.data;
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
     getBoardName(id) {
       axios({
-        method: 'post',
-        url: '/api/board/getName',
+        method: "post",
+        url: "/api/board/getName",
         data: {
-          boardID: id,
-        },
+          boardID: id
+        }
       })
         .then(data => {
-          this.boardName = data.data.title
+          this.boardName = data.data.title;
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
     modifyColumn(id, color, position) {
       axios({
-        method: 'post',
-        url: '/api/column/modify',
+        method: "post",
+        url: "/api/column/modify",
         data: {
           columnID: id,
           color: color,
-          position: position,
-        },
+          position: position
+        }
       })
         .then(data => {
-          this.refresh()
+          this.emitSocket("refresh");
         })
         .catch(error => {
-          this.error = error.message
-        })
+          this.error = error.message;
+        });
     },
-  },
-}
+    createTag(title) {
+      axios({
+        method: "post",
+        url: "/api/tag/create",
+        data: {
+          boardID: this.id,
+          title: title
+        }
+      })
+        .then(data => {
+          this.emitSocket("refresh");
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    },
+    getAllTags() {
+      axios({
+        method: "post",
+        url: "/api/tag/getAll",
+        data: {
+          boardID: this.id
+        }
+      })
+        .then(data => {
+          this.tags = data.data
+          this.emitSocket("refresh");
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    }
+  }
+};
 </script>
 
 <style scoped>
@@ -358,5 +417,4 @@ strong.user {
   text-decoration: none;
   color: white;
 }
-
 </style>
