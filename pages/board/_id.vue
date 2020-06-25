@@ -100,6 +100,17 @@
               <v-btn @click="addUser(userToAdd)">Ajouter un utilisateur</v-btn>
             </v-layout>
           </v-card>
+          <!-- create tag -->
+          <v-card class="mt-2">
+            <v-layout column class="pb-5 px-5">
+              <div v-for="tag in tags" :key="tag.id">
+                <p>{{ tag.title }}</p>
+              </div>
+              <v-text-field v-model="tagToAdd" placeholder="Nom du tag"></v-text-field>
+              <v-btn @click="createTag(tagToAdd)">Ajouter un tag</v-btn>
+            </v-layout>
+          </v-card>
+          <!-- /create tag -->
         </v-layout>
         <!-- /create column -->
       </v-layout>
@@ -157,6 +168,7 @@ export default {
     refresh() {
       this.columns = [];
       this.getBoardName(this.id);
+      this.getAllTags();
       this.getUsers(this.$store.state.user.id, this.id);
       axios({
         method: "post",
@@ -353,6 +365,7 @@ export default {
         }
       })
         .then(data => {
+          this.tags = data.data
           this.emitSocket("refresh");
         })
         .catch(error => {
