@@ -100,10 +100,9 @@ async function login(username, password) {
   const query = 'SELECT * FROM USER_ WHERE USERNAME = $1';
   const values = [username];
   const { rows } = await execQuery(query, values);
-  if (rows.length == 0)
+  if (!rows[0])
     return makeResp(400, { message: "Wrong username / password combinaison" })
-  const hash = bcrypt.hashSync(rows[0].password, salt);
-  if (!bcrypt.compareSync(rows[0].password, hash))
+  if (!bcrypt.compareSync(password, rows[0].password))
     return makeResp(400, { message: "Wrong username / password combinaison" })
   return makeResp(200, { id: rows[0].id })
 }
