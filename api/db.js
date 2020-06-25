@@ -62,6 +62,26 @@ async function checkHasBoardFromTagID(tag_id, user_id) {
   return checkHasBoardFromBoardID(tag.rows[0].board_id, user_id)
 }
 
+async function checkHasBoardFromChecklistID(checklist_id, user_id) {
+  const checklist = await execQuery(
+    'SELECT * FROM CHECKLIST WHERE ID = $1',
+    [checklist_id]
+  )
+  if (!checklist.rows[0])
+    return false
+  return checkHasBoardFromCardID(checklist.rows[0].card_id, user_id)
+}
+
+async function checkHasBoardFromChecklistElemID(checklist_elem_id, user_id) {
+  const checklist_elem = await execQuery(
+    'SELECT * FROM CHECKLIST_ELEM WHERE ID = $1',
+    [checklist_elem_id]
+  )
+  if (!checklist_elem.rows[0])
+    return false
+  return checkHasBoardFromChecklistID(checklist_elem.rows[0].checklist_id, user_id)
+}
+
 async function register(username, password) {
   const query = 'SELECT * FROM USER_ WHERE USERNAME = $1'
   const values = [username]
@@ -135,11 +155,35 @@ async function deleteBoard(user_id, board_id) {
   return makeResp(200);
 }
 
+async function getCheckListElem(checklist) {
+  const { rows } = await execQuery(
+    'SELECT * FROM CHECKLIST_ELEM WHERE CHECKLIST_ID = $1 ORDER BY POSITION ASC',
+    [checklist.id]
+  )
+  checklist.elems = rows
+  return checklist
+}
+
+async function getChecklist(card) {
+  const { rows } = await execQuery(
+    'SELECT * FROM CHECKLIST WHERE CARD_ID = $1 ORDER BY POSITION ASC',
+    [card.id]
+  )
+  for (var i in rows) {
+    rows[i] = await getCheckListElem(rows[i])
+  }
+  card.checklist = rows
+  return card
+}
+
 async function getCards(column) {
   const { rows } = await execQuery(
-    'SELECT * FROM CARD WHERE COLUMN_ID = $1',
+    'SELECT * FROM CARD WHERE COLUMN_ID = $1 ORDER BY POSITION ASC',
     [column.id]
   )
+  for (var i in rows) {
+    rows[i] = await getChecklist(rows[i])
+  }
   column.cards = rows
   return column
 }
@@ -151,7 +195,7 @@ async function getBoard(user_id, board_id) {
 
   // get board data
   const { rows } = await execQuery(
-    'SELECT COLUMN_.* FROM BOARD LEFT JOIN COLUMN_ ON COLUMN_.BOARD_ID = BOARD.ID WHERE BOARD.ID = $1',
+    'SELECT COLUMN_.* FROM BOARD LEFT JOIN COLUMN_ ON COLUMN_.BOARD_ID = BOARD.ID WHERE BOARD.ID = $1 ORDER BY COLUMN_.POSITION ASC',
     [board_id]
   );
   for (var i in rows) {
@@ -384,6 +428,87 @@ async function getAllTags(user_id, board_id) {
   return makeResp(200, rows)
 }
 
+async function createChecklist(user_id, card_id, title, position) {
+  // check board access
+  if (await checkHasBoardFromCardID(card_id, user_id) == false)
+    return makeResp(403, { message: "you don't have the specified board" })
+
+  // create checklist object
+  const { rows } = await execQuery(
+    'INSERT INTO CHECKLIST(TITLE, POSITION, CARD_ID) VALUES($1, $2, $3) RETURNING *',
+    [title, position, card_id]
+  )
+  return makeResp(200, rows[0])
+}
+
+async function deleteChecklist(user_id, checklist_id) {
+  // check board access
+  if (await checkHasBoardFromChecklistID(checklist_id, user_id) == false)
+    return makeResp(403, { message: "you don't have the specified board / checklist not found" })
+
+  // delete checklist object
+  const { rows } = await execQuery(
+    'DELETE FROM CHECKLIST WHERE ID = $1 RETURNING *'
+    [checklist_id]
+  )
+
+  if (!rows[0])
+    return makeResp(400, { message: "checklist not found" })
+  return makeResp(200)
+}
+
+async function addElemChecklist(user_id, checklist_id, title, position) {
+  // check board access
+  if (await checkHasBoardFromChecklistID(checklist_id, user_id) == false)
+    return makeResp(403, { message: "you don't have the specified board / checklist not found" })
+
+  // create checklist_elem object
+  const { rows } = await execQuery(
+    'INSERT INTO CHECKLIST_ELEM(TITLE, POSITION, CHECKED, CHECKLIST_ID) VALUES($1, $2, FALSE, $3)',
+    [title, position, checklist_id]
+  )
+  return makeResp(200, rows[0])
+}
+
+async function removeElemChecklist(user_id, checklist_elem_id) {
+  // check board access
+  if (await checkHasBoardFromChecklistElemID(checklist_elem_id, user_id) == false)
+    return makeResp(403, { message: "you don't have the specified board / checklist elem not found" })
+
+  // delete checklist_elem object
+  const { rows } = await execQuery(
+    'DELETE FROM CHECKLIST_ELEM WHERE ID = $1 RETURNING *',
+    [checklist_elem_id]
+  )
+
+  if (!rows[0])
+    return makeResp(400, { message: "checklist_elem not found" })
+  return makeResp(200)
+}
+
+async function modifyElemChecklist(user_id, checklist_elem_id, checked, title, position) {
+  // check board access
+  if (await checkHasBoardFromChecklistElemID(checklist_elem_id, user_id) == false)
+    return makeResp(403, { message: "you don't have the specified board / checklist elem not found" })
+
+  // get previous values
+  const p = await execQuery(
+    'SELECT * FROM CHECKLIST_ELEM WHERE ID = $1',
+    [checklist_elem_id]
+  )
+  const previous_values = p.rows[0];
+
+  // modify values
+  const { rows } = await execQuery(
+    'UPDATE CHECKLIST_ELEM SET TITLE = $1, POSITION = $2, CHECKED = $3 WHERE ID = $4 RETURNING *',
+    [title ? title : previous_values.title,
+    position ? position : previous_values.position,
+    checked ? checked : previous_values.checked,
+      checklist_elem_id]
+  )
+  return makeResp(200, rows[0])
+}
+
 var db = {
   register,
   login,
@@ -404,7 +529,12 @@ var db = {
   getBoardUsers,
   createTag,
   deleteTag,
-  getAllTags
+  getAllTags,
+  createChecklist,
+  deleteChecklist,
+  addElemChecklist,
+  removeElemChecklist,
+  modifyElemChecklist
 }
 
 module.exports = db
