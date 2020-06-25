@@ -141,7 +141,7 @@ export default {
       this.getUsers(this.$store.state.user.id, this.id)
       axios({
         method: 'post',
-        url: '/api/board/getBoard',
+        url: '/api/board/getID',
         data: {
           boardID: this.id,
         },
@@ -156,7 +156,7 @@ export default {
     createColumn(title, color, textColor) {
       axios({
         method: 'post',
-        url: '/api/board/createColumn',
+        url: '/api/column/create',
         data: {
           boardID: this.id,
           title: title,
@@ -176,7 +176,7 @@ export default {
     deleteColumn(id) {
       axios({
         method: 'post',
-        url: '/api/board/deleteColumn',
+        url: '/api/column/delete',
         data: {
           columnID: id,
         },
@@ -192,7 +192,7 @@ export default {
     createCard(title, columnID, color, textColor) {
       axios({
         method: 'post',
-        url: '/api/board/createCard',
+        url: '/api/card/create',
         data: {
           title: title,
           columnID: columnID,
@@ -212,7 +212,7 @@ export default {
     deleteCard(cardID) {
       axios({
         method: 'post',
-        url: '/api/board/deleteCard',
+        url: '/api/card/delete',
         data: {
           cardID: cardID,
         },
@@ -284,7 +284,7 @@ export default {
     getBoardName(id) {
       axios({
         method: 'post',
-        url: '/api/board/getBoardName',
+        url: '/api/board/getName',
         data: {
           boardID: id,
         },
@@ -299,7 +299,7 @@ export default {
     modifyColumn(id, color, position) {
       axios({
         method: 'post',
-        url: '/api/board/modifyColumn',
+        url: '/api/column/modify',
         data: {
           columnID: id,
           color: color,

@@ -18,10 +18,14 @@ router.use((req, res, next) => {
 const auth = require('./route/auth');
 const board = require('./route/board');
 const user = require('./route/user');
+const column = require('./route/column');
+const card = require('./route/card');
 
 router.use('/auth', auth)
 router.use('/board', board)
 router.use('/user', user)
+router.use('/column', column)
+router.use('/card', card)
 
 // Export the server middleware
 export default {
