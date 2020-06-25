@@ -1,6 +1,5 @@
 const { Pool } = require('pg')
 const bcrypt = require('bcrypt');
-const { text } = require('body-parser');
 // salt is the encryption key used to encode / decode
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
@@ -51,6 +50,16 @@ async function checkHasBoardFromCardID(card_id, user_id) {
   if (!card.rows[0])
     return false
   return checkHasBoardFromColID(card.rows[0].column_id, user_id)
+}
+
+async function checkHasBoardFromTagID(tag_id, user_id) {
+  const tag = await execQuery(
+    'SELECT * FROM TAG WHERE ID = $1',
+    [tag_id]
+  )
+  if (!tag.rows[0])
+    return false
+  return checkHasBoardFromBoardID(tag.rows[0].board_id, user_id)
 }
 
 async function register(username, password) {
@@ -325,10 +334,51 @@ async function getBoardUsers(user_id, board_id) {
   // check board access
   if (await checkHasBoardFromBoardID(board_id, user_id) == false)
     return makeResp(403, { message: "you don't have the specified board" })
-  
+
   // get all users
   const { rows } = await execQuery(
     'SELECT USER_.USERNAME, USER_.ID FROM USER_BOARD LEFT JOIN USER_ ON USER_BOARD.USER_ID = USER_.ID WHERE USER_BOARD.BOARD_ID = $1',
+    [board_id]
+  )
+  return makeResp(200, rows)
+}
+
+async function createTag(user_id, board_id, title) {
+  // check board access
+  if (await checkHasBoardFromBoardID(board_id, user_id) == false)
+    return makeResp(403, { message: "you don't have the specified board" })
+
+  // create tag
+  const { rows } = await execQuery(
+    'INSERT INTO TAG(TITLE, BOARD_ID) VALUES($1, $2) RETURNING *;',
+    [title, board_id]
+  )
+  return makeResp(200, rows[0])
+}
+
+async function deleteTag(user_id, tag_id) {
+  // check board access
+  if (await checkHasBoardFromTagID(tag_id, user_id) == false)
+    return makeResp(403, { message: "you don't have the specified board" })
+
+  // delete tag object
+  const { rows } = await execQuery(
+    'DELETE FROM TAG WHERE ID = $1 RETURNING *',
+    [tag_id]
+  )
+  if (!rows[0])
+    return makeResp(400, { message: "tag not found" })
+  return makeResp(200)
+}
+
+async function getAllTags(user_id, board_id) {
+  // check board access
+  if (await checkHasBoardFromBoardID(board_id, user_id) == false)
+    return makeResp(403, { message: "you don't have the specified board" })
+
+  // get all tags
+  const { rows } = await execQuery(
+    'SELECT * FROM TAG WHERE BOARD_ID = $1',
     [board_id]
   )
   return makeResp(200, rows)
@@ -351,7 +401,10 @@ var db = {
   addUserToBoard,
   modifyCard,
   modifyColumn,
-  getBoardUsers
+  getBoardUsers,
+  createTag,
+  deleteTag,
+  getAllTags
 }
 
 module.exports = db
