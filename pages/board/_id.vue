@@ -27,6 +27,24 @@
             >
               <v-layout column class="pa-4 ma-0">
                 <h3>{{ card.title }}</h3>
+                <!-- each checklist -->
+                <v-card
+                  class="my-custom-card mb-3"
+                  v-for="checklist in card.checklist"
+                  :key="checklist.id"
+                >
+                  <v-card-title>{{ checklist.title }}</v-card-title>
+                  <!-- each checklist items -->
+                  <div v-for="elem in checklist.elems" :key="elem.id">
+                    <v-checkbox
+                      v-model="elem.checked"
+                      :label="elem.title"
+                      @click="modifyChecklistElem(elem.id, !elem.checked)"
+                    ></v-checkbox>
+                  </div>
+                  <!-- /each checklist items -->
+                </v-card>
+                <!-- /each checklist -->
                 <v-card-actions class="ma-0 pa-0">
                   <v-spacer />
                   <!-- <v-btn @click="cardColorSwitcher()" color="brown" fab x-small dark>
@@ -168,7 +186,7 @@ export default {
     refresh() {
       this.columns = [];
       this.getBoardName(this.id);
-      this.getAllTags();
+      this.getTags();
       this.getUsers(this.$store.state.user.id, this.id);
       axios({
         method: "post",
@@ -356,7 +374,22 @@ export default {
           this.error = error.message;
         });
     },
-    getAllTags() {
+    deleteTag(tagID) {
+      axios({
+        method: "post",
+        url: "/api/tag/delete",
+        data: {
+          tagID: tagID
+        }
+      })
+        .then(data => {
+          this.emitSocket("refresh");
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    },
+    getTags() {
       axios({
         method: "post",
         url: "/api/tag/getAll",
@@ -365,7 +398,86 @@ export default {
         }
       })
         .then(data => {
-          this.tags = data.data
+          this.tags = data.data;
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    },
+    createChecklist(cardID, title, position) {
+      axios({
+        method: "post",
+        url: "/api/checklist/create",
+        data: {
+          cardID: cardID,
+          title: title,
+          position: position
+        }
+      })
+        .then(data => {
+          this.emitSocket("refresh");
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    },
+    deleteChecklist(checklistID) {
+      axios({
+        method: "post",
+        url: "/api/checklist/delete",
+        data: {
+          checklistID: checklistID
+        }
+      })
+        .then(data => {
+          this.emitSocket("refresh");
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    },
+    addChecklistElem(checklistID, title, position) {
+      axios({
+        method: "post",
+        url: "/api/checklist/addElem",
+        data: {
+          checklistID: checklistID,
+          title: title,
+          position: position
+        }
+      })
+        .then(data => {
+          this.emitSocket("refresh");
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    },
+    removeChecklistElem(checklistElemID) {
+      axios({
+        method: "post",
+        url: "/api/checklist/removeElem",
+        data: {
+          checklistElemID: checklistElemID
+        }
+      })
+        .then(data => {
+          this.emitSocket("refresh");
+        })
+        .catch(error => {
+          this.error = error.message;
+        });
+    },
+    modifyChecklistElem(id, checked) {
+      axios({
+        method: "post",
+        url: "/api/checklist/modifyElem",
+        data: {
+          checklistElemID: id,
+          checked: checked
+        }
+      })
+        .then(data => {
           this.emitSocket("refresh");
         })
         .catch(error => {

@@ -6,66 +6,66 @@ var router = express.Router();
 
 /**
  * POST
- * /api/card/create
+ * /api/checklist/create
  */
 router.post('/create', async (req, res) => {
   if (!req.session.user)
     return res.status(401).json({ message: "user not auth" })
-  if (!req.body.title || !req.body.columnID || !req.body.color || !req.body.textColor || req.body.position == undefined)
+  if (!req.body.cardID || !req.body.title || req.body.position == undefined)
     return res.status(400).json({ message: "missing required fields" })
-  const resp = await db.createCard(req.session.user.id, req.body.title, req.body.columnID, req.body.color, req.body.textColor, req.body.position)
+  const resp = await db.createChecklist(req.session.user.id, req.body.cardID, req.body.title, req.body.position)
   return res.status(resp.status).json(resp.data)
 })
 
 /**
  * POST
- * /api/card/modify
- */
-router.post('/modify', async (req, res) => {
-  if (!req.session.user)
-    return res.status(401).json({ message: "user not auth" })
-  if (!req.body.cardID)
-    return res.status(400).json({ message: "missing required fields" })
-  const resp = await db.modifyCard(req.session.user.id, req.body.cardID, req.body.title, req.body.columnID, req.body.color, req.body.textColor, req.body.position, req.body.description)
-  return res.status(resp.status).json(resp.data)
-})
-
-/**
- * POST
- * /api/card/delete
+ * /api/checklist/delete
  */
 router.post('/delete', async (req, res) => {
   if (!req.session.user)
     return res.status(401).json({ message: "user not auth" })
-  if (!req.body.cardID)
+  if (!req.body.checklistID)
     return res.status(400).json({ message: "missing required fields" })
-  const resp = await db.deleteCard(req.session.user.id, req.body.cardID)
+  const resp = await db.deleteChecklist(req.session.user.id, req.body.checklistID)
   return res.status(resp.status).json(resp.data)
 })
 
 /**
  * POST
- * /api/card/addTag
+ * /api/checlist/addElem
  */
-router.post('/addTag', async (req, res) => {
+router.post('/addElem', async (req, res) => {
   if (!req.session.user)
     return res.status(401).json({ message: "user not auth" })
-  if (!req.body.cardID || !req.body.tagID)
+  if (!req.body.checklistID, !req.body.title || req.body.position == undefined)
     return res.status(400).json({ message: "missing required fields" })
-  const resp = await db.addTag(req.session.user.id, req.body.cardID, req.body.tagID)
+  const resp = await db.addElemChecklist(req.session.user.id, req.body.checklistID, req.body.title, req.body.position)
   return res.status(resp.status).json(resp.data)
 })
 
 /**
  * POST
- * /api/card/removeTag
+ * /api/checlist/removeElem
  */
-router.post('/removeTag', async (req, res) => {
+router.post('/removeElem', async (req, res) => {
   if (!req.session.user)
     return res.status(401).json({ message: "user not auth" })
-  if (!req.body.cardID || !req.body.tagID)
+  if (!req.body.checklistElemID)
     return res.status(400).json({ message: "missing required fields" })
-  const resp = await db.removeTag(req.session.user.id, req.body.cardID, req.body.tagID)
+  const resp = await db.removeElemChecklist(req.session.user.id, req.body.checklistElemID)
+  return res.status(resp.status).json(resp.data)
+})
+
+/**
+ * POST
+ * /api/checlist/modifyElem
+ */
+router.post('/modifyElem', async (req, res) => {
+  if (!req.session.user)
+    return res.status(401).json({ message: "user not auth" })
+  if (!req.body.checklistElemID)
+    return res.status(400).json({ message: "missing required fields" })
+  const resp = await db.modifyElemChecklist(req.session.user.id, req.body.checklistElemID, req.body.checked, req.body.title, req.body.position)
   return res.status(resp.status).json(resp.data)
 })
 

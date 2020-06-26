@@ -78,6 +78,7 @@ CREATE TABLE public.card (
     color text NOT NULL,
     text_color text NOT NULL,
     "position" integer NOT NULL,
+    description text,
     column_id integer
 );
 
@@ -139,6 +140,79 @@ ALTER TABLE public.card_tag_id_seq OWNER TO "user";
 --
 
 ALTER SEQUENCE public.card_tag_id_seq OWNED BY public.card_tag.id;
+
+
+--
+-- Name: checklist; Type: TABLE; Schema: public; Owner: user
+--
+
+CREATE TABLE public.checklist (
+    id integer NOT NULL,
+    title text NOT NULL,
+    "position" integer NOT NULL,
+    card_id integer
+);
+
+
+ALTER TABLE public.checklist OWNER TO "user";
+
+--
+-- Name: checklist_elem; Type: TABLE; Schema: public; Owner: user
+--
+
+CREATE TABLE public.checklist_elem (
+    id integer NOT NULL,
+    title text NOT NULL,
+    checked boolean NOT NULL,
+    "position" integer NOT NULL,
+    checklist_id integer
+);
+
+
+ALTER TABLE public.checklist_elem OWNER TO "user";
+
+--
+-- Name: checklist_elem_id_seq; Type: SEQUENCE; Schema: public; Owner: user
+--
+
+CREATE SEQUENCE public.checklist_elem_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.checklist_elem_id_seq OWNER TO "user";
+
+--
+-- Name: checklist_elem_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+--
+
+ALTER SEQUENCE public.checklist_elem_id_seq OWNED BY public.checklist_elem.id;
+
+
+--
+-- Name: checklist_id_seq; Type: SEQUENCE; Schema: public; Owner: user
+--
+
+CREATE SEQUENCE public.checklist_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.checklist_id_seq OWNER TO "user";
+
+--
+-- Name: checklist_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+--
+
+ALTER SEQUENCE public.checklist_id_seq OWNED BY public.checklist.id;
 
 
 --
@@ -320,6 +394,20 @@ ALTER TABLE ONLY public.card_tag ALTER COLUMN id SET DEFAULT nextval('public.car
 
 
 --
+-- Name: checklist id; Type: DEFAULT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.checklist ALTER COLUMN id SET DEFAULT nextval('public.checklist_id_seq'::regclass);
+
+
+--
+-- Name: checklist_elem id; Type: DEFAULT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.checklist_elem ALTER COLUMN id SET DEFAULT nextval('public.checklist_elem_id_seq'::regclass);
+
+
+--
 -- Name: column_ id; Type: DEFAULT; Schema: public; Owner: user
 --
 
@@ -359,7 +447,7 @@ COPY public.board (id, title) FROM stdin;
 -- Data for Name: card; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.card (id, title, color, text_color, "position", column_id) FROM stdin;
+COPY public.card (id, title, color, text_color, "position", description, column_id) FROM stdin;
 \.
 
 
@@ -368,6 +456,22 @@ COPY public.card (id, title, color, text_color, "position", column_id) FROM stdi
 --
 
 COPY public.card_tag (id, card_id, tag_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: checklist; Type: TABLE DATA; Schema: public; Owner: user
+--
+
+COPY public.checklist (id, title, "position", card_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: checklist_elem; Type: TABLE DATA; Schema: public; Owner: user
+--
+
+COPY public.checklist_elem (id, title, checked, "position", checklist_id) FROM stdin;
 \.
 
 
@@ -433,6 +537,20 @@ SELECT pg_catalog.setval('public.card_tag_id_seq', 1, false);
 
 
 --
+-- Name: checklist_elem_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
+--
+
+SELECT pg_catalog.setval('public.checklist_elem_id_seq', 1, false);
+
+
+--
+-- Name: checklist_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
+--
+
+SELECT pg_catalog.setval('public.checklist_id_seq', 1, false);
+
+
+--
 -- Name: column__id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
@@ -482,6 +600,22 @@ ALTER TABLE ONLY public.card
 
 ALTER TABLE ONLY public.card_tag
     ADD CONSTRAINT card_tag_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: checklist_elem checklist_elem_pkey; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.checklist_elem
+    ADD CONSTRAINT checklist_elem_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: checklist checklist_pkey; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.checklist
+    ADD CONSTRAINT checklist_pkey PRIMARY KEY (id);
 
 
 --
@@ -545,7 +679,7 @@ ALTER TABLE ONLY public.card
 --
 
 ALTER TABLE ONLY public.card_tag
-    ADD CONSTRAINT card_tag_card_id_fkey FOREIGN KEY (card_id) REFERENCES public.card(id);
+    ADD CONSTRAINT card_tag_card_id_fkey FOREIGN KEY (card_id) REFERENCES public.card(id) ON DELETE CASCADE;
 
 
 --
@@ -553,7 +687,23 @@ ALTER TABLE ONLY public.card_tag
 --
 
 ALTER TABLE ONLY public.card_tag
-    ADD CONSTRAINT card_tag_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public.tag(id);
+    ADD CONSTRAINT card_tag_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES public.tag(id) ON DELETE CASCADE;
+
+
+--
+-- Name: checklist checklist_card_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.checklist
+    ADD CONSTRAINT checklist_card_id_fkey FOREIGN KEY (card_id) REFERENCES public.card(id) ON DELETE CASCADE;
+
+
+--
+-- Name: checklist_elem checklist_elem_checklist_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.checklist_elem
+    ADD CONSTRAINT checklist_elem_checklist_id_fkey FOREIGN KEY (checklist_id) REFERENCES public.checklist(id) ON DELETE CASCADE;
 
 
 --
@@ -569,7 +719,7 @@ ALTER TABLE ONLY public.column_
 --
 
 ALTER TABLE ONLY public.tag
-    ADD CONSTRAINT tag_board_id_fkey FOREIGN KEY (board_id) REFERENCES public.board(id);
+    ADD CONSTRAINT tag_board_id_fkey FOREIGN KEY (board_id) REFERENCES public.board(id) ON DELETE CASCADE;
 
 
 --
