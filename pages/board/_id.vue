@@ -86,7 +86,7 @@
                                 :label="elem.title"
                                 @click="modifyChecklistElem(elem.id, !elem.checked)"
                               ></v-checkbox>
-                              <v-spacer/>
+                              <v-spacer />
                               <v-btn class="mt-3" @click="removeChecklistElem(elem.id)" color="#561705" fab x-small dark>
                                 <v-icon>mdi-delete</v-icon>
                               </v-btn>
@@ -105,6 +105,12 @@
                     </v-card>
                   </v-dialog>
                   <!-- /each checklist items -->
+                  <v-card-actions class="ma-0 pa-0">
+                    <v-spacer />
+                    <v-btn class="mb-2 mr-2" @click="deleteChecklist(checklist.id)" color="#561705" fab x-small dark>
+                      <v-icon>mdi-delete</v-icon>
+                    </v-btn>
+                  </v-card-actions>
                 </v-card>
                 <!-- /each checklist -->
                 <v-card-actions class="ma-0 pa-0">
