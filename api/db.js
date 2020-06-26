@@ -317,7 +317,7 @@ async function modifyCard(user_id, card_id, title, col_id, color, text_color, po
     col_id ? col_id : previous_values.column_id,
     color ? color : previous_values.color,
     text_color ? text_color : previous_values.text_color,
-    position ? position : previous_values.position,
+    position != undefined ? position : previous_values.position,
       card_id]
   )
   return makeResp(200, rows[0])
@@ -501,8 +501,8 @@ async function modifyElemChecklist(user_id, checklist_elem_id, checked, title, p
   const { rows } = await execQuery(
     'UPDATE CHECKLIST_ELEM SET TITLE = $1, POSITION = $2, CHECKED = $3 WHERE ID = $4 RETURNING *',
     [title ? title : previous_values.title,
-    position ? position : previous_values.position,
-    checked ? checked : previous_values.checked,
+    position != undefined ? position : previous_values.position,
+    checked != undefined ? checked : previous_values.checked,
       checklist_elem_id]
   )
   return makeResp(200, rows[0])
