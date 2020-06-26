@@ -28,6 +28,7 @@
               <v-layout column class="pa-4 ma-0">
                 <h3>{{ card.title }}</h3>
                 <!-- each checklist -->
+                {{ tags }}
                 <v-card
                   class="my-custom-card mb-3"
                   v-for="checklist in card.checklist"
