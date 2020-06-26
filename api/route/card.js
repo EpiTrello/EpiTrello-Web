@@ -26,7 +26,7 @@ router.post('/modify', async (req, res) => {
     return res.status(401).json({ message: "user not auth" })
   if (!req.body.cardID)
     return res.status(400).json({ message: "missing required fields" })
-  const resp = await db.modifyCard(req.session.user.id, req.body.cardID, req.body.title, req.body.columnID, req.body.color, req.body.textColor, req.body.position)
+  const resp = await db.modifyCard(req.session.user.id, req.body.cardID, req.body.title, req.body.columnID, req.body.color, req.body.textColor, req.body.position, req.body.description)
   return res.status(resp.status).json(resp.data)
 })
 
@@ -43,5 +43,30 @@ router.post('/delete', async (req, res) => {
   return res.status(resp.status).json(resp.data)
 })
 
+/**
+ * POST
+ * /api/card/addTag
+ */
+router.post('/addTag', async (req, res) => {
+  if (!req.session.user)
+    return res.status(401).json({ message: "user not auth" })
+  if (!req.body.cardID || !req.body.tagID)
+    return res.status(400).json({ message: "missing required fields" })
+  const resp = await db.addTag(req.session.user.id, req.body.cardID, req.body.tagID)
+  return res.status(resp.status).json(resp.data)
+})
+
+/**
+ * POST
+ * /api/card/removeTag
+ */
+router.post('/removeTag', async (req, res) => {
+  if (!req.session.user)
+    return res.status(401).json({ message: "user not auth" })
+  if (!req.body.cardID || !req.body.tagID)
+    return res.status(400).json({ message: "missing required fields" })
+  const resp = await db.removeTag(req.session.user.id, req.body.cardID, req.body.tagID)
+  return res.status(resp.status).json(resp.data)
+})
 
 module.exports = router;

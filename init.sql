@@ -78,6 +78,7 @@ CREATE TABLE public.card (
     color text NOT NULL,
     text_color text NOT NULL,
     "position" integer NOT NULL,
+    description text,
     column_id integer
 );
 
@@ -446,7 +447,7 @@ COPY public.board (id, title) FROM stdin;
 -- Data for Name: card; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.card (id, title, color, text_color, "position", column_id) FROM stdin;
+COPY public.card (id, title, color, text_color, "position", description, column_id) FROM stdin;
 \.
 
 
